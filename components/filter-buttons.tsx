@@ -8,9 +8,10 @@ import {
     DropdownMenuCheckboxItem,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
+import { Fragment } from "react"
 
 
-export const FilterButton = () => {
+export const FilterButton = ({ filters }: { filters: string[] }) => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -22,9 +23,16 @@ export const FilterButton = () => {
             <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Filter by</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem checked>In Stock</DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>Low Stock</DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>Out of Stock</DropdownMenuCheckboxItem>
+                {filters.map((filter, index) => {
+                    const filterName = filter.split(/(?=[A-Z])/).join(' ')
+                    return (
+                        <Fragment key={index}>
+                            {/* Add checked props to DropdownMenuCheckboxItem */}
+                            <DropdownMenuCheckboxItem className="capitalize">{filterName}</DropdownMenuCheckboxItem>
+                        </Fragment>
+                    )
+                })}
+
             </DropdownMenuContent>
         </DropdownMenu>
     )

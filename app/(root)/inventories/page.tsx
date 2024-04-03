@@ -35,8 +35,8 @@ const InventoryPage = () => {
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
           <Tabs defaultValue="all">
             <div className="flex items-center">
-              <TabLists tabs={["In Stock", "Low Stock", "Out of Stock"]} />
-              <ActionButtons />
+              <TabLists tabs={["inStock", "lowStock", "outOfStock"]} />
+              <ActionButtons btnName="Add Inventory" filters={["inStock", "lowStock", "outOfStock"]} />
             </div>
             <TabsContent value="all">
               <Card>

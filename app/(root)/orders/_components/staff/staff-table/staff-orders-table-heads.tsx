@@ -1,6 +1,6 @@
 import { TableHead, TableRow } from "@/components/ui/table"
 
-export const OrdersTableHeads = () => {
+export const StaffOrdersTableHeads = () => {
     return (
         <TableRow>
             <TableHead>Customer Name</TableHead>

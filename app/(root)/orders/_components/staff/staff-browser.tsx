@@ -18,8 +18,9 @@ import { ActionButtons } from "@/components/action-buttons"
 import { MobileSidebar } from "@/components/mobile-sidebar"
 import { AccountSettings } from "@/components/account-settings"
 
-import { OrdersTable } from "./table/orders-table"
+
 import { TabLists } from "@/components/tab-list"
+import { StaffOrdersTable } from "./staff-table/staff-orders-table"
 
 
 
@@ -38,7 +39,7 @@ export const StaffBrowser = () => {
           <Tabs defaultValue="all">
             <div className="flex items-center">
               <TabLists tabs={["week", "month", "year"]} />
-              <ActionButtons />
+              <ActionButtons btnName="New Order" filters={["FulFilled", "Declined", "Pending"]} />
             </div>
             <TabsContent value="all">
               <Card>
@@ -49,7 +50,7 @@ export const StaffBrowser = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <OrdersTable />
+                  <StaffOrdersTable />
                 </CardContent>
                 <CardFooter>
                   <div className="text-xs text-muted-foreground">

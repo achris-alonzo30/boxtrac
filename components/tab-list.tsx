@@ -6,11 +6,14 @@ export const TabLists = ({ tabs }: { tabs: string[] }) => {
     return (
         <TabsList>
             <TabsTrigger value="all">All</TabsTrigger>
-            {tabs.map((tab, index) => (
-                <Fragment key={index}>
-                    <TabsTrigger value={tab}>{tab}</TabsTrigger>
-                </Fragment>
-            ))}
+            {tabs.map((tab, index) => {
+                const tabName = tab.split(/(?=[A-Z])/).join(' ')
+                return (
+                    <Fragment key={index}>
+                        <TabsTrigger value={tab} className="capitalize">{tabName}</TabsTrigger>
+                    </Fragment>
+                )
+            })}
 
         </TabsList>
     )

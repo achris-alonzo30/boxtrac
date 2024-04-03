@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button"  
 import { MoreHorizontal } from "lucide-react"
 
-export const OrdersActions = () => {
+export const AdminOrdersActions = () => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>

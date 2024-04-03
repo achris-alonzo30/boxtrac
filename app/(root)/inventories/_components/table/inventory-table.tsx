@@ -20,7 +20,7 @@ const data = [
         price: "$499.99",
         quantity: 25,
         supplier: "Tech Industries",
-        purchasedDate: "2023-07-12 10:42 AM",
+        transactionDate: "2023-07-12 10:42 AM",
     },
     {
         image: "/placeholder.svg",
@@ -30,7 +30,7 @@ const data = [
         price: "$39.99",
         quantity: 10,
         supplier: "Lighting Emporium",
-        purchasedDate: "2023-07-12 10:42 AM",
+        transactionDate: "2023-07-12 10:42 AM",
     },
     {
         image: "/placeholder.svg",
@@ -40,7 +40,7 @@ const data = [
         price: "$129.99",
         quantity: 5,
         supplier: "AudioTech",
-        purchasedDate: "2023-07-12 10:42 AM",
+        transactionDate: "2023-07-12 10:42 AM",
     },
     {
         image: "/placeholder.svg",
@@ -50,7 +50,7 @@ const data = [
         price: "$2.99",
         quantity: 0,
         supplier: "Beverage Co.",
-        purchasedDate: "2023-07-12 10:42 AM",
+        transactionDate: "2023-07-12 10:42 AM",
     },
     {
         image: "/placeholder.svg",
@@ -60,7 +60,7 @@ const data = [
         price: "$59.99",
         quantity: 75,
         supplier: "Gaming World",
-        purchasedDate: "2023-07-12 10:42 AM",
+        transactionDate: "2023-07-12 10:42 AM",
     },
 ];
 
@@ -98,7 +98,7 @@ export const InventoryTable = () => {
                             <TableCell className="hidden md:table-cell">{item.quantity}</TableCell>
                             <TableCell className="hidden md:table-cell">{item.price}</TableCell>
                             <TableCell className="font-medium">{item.supplier}</TableCell>
-                            <TableCell className="hidden md:table-cell">{item.purchasedDate}</TableCell>
+                            <TableCell className="hidden md:table-cell">{item.transactionDate}</TableCell>
                             <TableCell>
                                 <InventoryActions />
                             </TableCell>
