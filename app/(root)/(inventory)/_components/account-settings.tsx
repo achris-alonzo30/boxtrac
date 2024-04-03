@@ -20,9 +20,9 @@ export const AccountSettings = () => {
                     className="overflow-hidden rounded-full"
                 >
                     <Image
-                        src="/placeholder-user.jpg"
-                        width={36}
-                        height={36}
+                        src="/placeholder-user.svg"
+                        width={24}
+                        height={24}
                         alt="Avatar"
                         className="overflow-hidden"
                     />

@@ -7,15 +7,19 @@ export const TableHeads = () => {
                 <span className="sr-only">Image</span>
             </TableHead>
             <TableHead>Name</TableHead>
+            <TableHead>Size</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead className="hidden md:table-cell">
+                Quantity
+            </TableHead>
             <TableHead className="hidden md:table-cell">
                 Price
             </TableHead>
             <TableHead className="hidden md:table-cell">
-                Total Sales
+                Supplier
             </TableHead>
             <TableHead className="hidden md:table-cell">
-                Created at
+                Date of Purchase
             </TableHead>
             <TableHead>
                 <span className="sr-only">Actions</span>
