@@ -11,14 +11,15 @@ import {
   Tabs,
   TabsContent,
 } from "@/components/ui/tabs"
-import { Sidebar } from "./_components/sidebar"
-import { SearchBar } from "./_components/search-bar"
-import { TabsLists } from "./_components/tabs-lists"
-import { ActionButtons } from "./_components/action-buttons"
-import { MobileSidebar } from "./_components/mobile-sidebar"
-import { InventoryTable } from "./_components/table/inventory-table"
-import { AccountSettings } from "./_components/account-settings"
+import { Sidebar } from "@/components/sidebar"
+import { TabLists } from "@/components/tab-list"
+import { SearchBar } from "@/components/search-bar"
 import { ModeToggle } from "@/components/mode-toggle"
+import { ActionButtons } from "@/components/action-buttons"
+import { MobileSidebar } from "@/components/mobile-sidebar"
+import { AccountSettings } from "@/components/account-settings"
+import { InventoryTable } from "./_components/table/inventory-table"
+
 
 const InventoryPage = () => {
   return (
@@ -34,7 +35,7 @@ const InventoryPage = () => {
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
           <Tabs defaultValue="all">
             <div className="flex items-center">
-              <TabsLists />
+              <TabLists tabs={["In Stock", "Low Stock", "Out of Stock"]} />
               <ActionButtons />
             </div>
             <TabsContent value="all">

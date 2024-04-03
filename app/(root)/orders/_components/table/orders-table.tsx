@@ -7,9 +7,9 @@ import {
     TableCell,
     TableHeader,
 } from "@/components/ui/table"
-import { TableHeads } from "./table-heads"
 import { Badge } from "@/components/ui/badge"
-import { InventoryActions } from "./inventory-actions"
+import { OrdersActions } from "./orders-actions"
+import { OrdersTableHeads } from "./orders-table-heads"
 
 const data = [
     {
@@ -65,11 +65,11 @@ const data = [
 ];
 
 
-export const InventoryTable = () => {
+export const OrdersTable = () => {
     return (
         <Table>
             <TableHeader>
-                <TableHeads />
+                <OrdersTableHeads />
             </TableHeader>
             <TableBody>
                 {data.map((item, index) => {
@@ -100,7 +100,7 @@ export const InventoryTable = () => {
                             <TableCell className="font-medium">{item.supplier}</TableCell>
                             <TableCell className="hidden md:table-cell">{item.purchasedDate}</TableCell>
                             <TableCell>
-                                <InventoryActions />
+                                <OrdersActions />
                             </TableCell>
                         </TableRow>
                     )

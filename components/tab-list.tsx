@@ -1,0 +1,17 @@
+import { TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Fragment } from "react"
+
+
+export const TabLists = ({ tabs }: { tabs: string[] }) => {
+    return (
+        <TabsList>
+            <TabsTrigger value="all">All</TabsTrigger>
+            {tabs.map((tab, index) => (
+                <Fragment key={index}>
+                    <TabsTrigger value={tab}>{tab}</TabsTrigger>
+                </Fragment>
+            ))}
+
+        </TabsList>
+    )
+}

@@ -21,7 +21,7 @@ export const ActionTooltip = ({ children, name }: ActionTooltipProps ) => {
                 <TooltipTrigger asChild>
                     {children}
                 </TooltipTrigger>
-                <TooltipContent side="right">name</TooltipContent>
+                <TooltipContent side="right">{name}</TooltipContent>
             </Tooltip>
         </TooltipProvider>
     )

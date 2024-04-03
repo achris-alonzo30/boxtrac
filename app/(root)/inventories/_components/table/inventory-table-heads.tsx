@@ -1,6 +1,6 @@
 import { TableHead, TableRow } from "@/components/ui/table"
 
-export const TableHeads = () => {
+export const InventoryTableHeads = () => {
     return (
         <TableRow>
             <TableHead className="hidden w-[100px] sm:table-cell">
@@ -19,7 +19,7 @@ export const TableHeads = () => {
                 Supplier
             </TableHead>
             <TableHead className="hidden md:table-cell">
-                Date of Purchase
+                Transaction Date
             </TableHead>
             <TableHead>
                 <span className="sr-only">Actions</span>

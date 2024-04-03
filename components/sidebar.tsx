@@ -1,11 +1,11 @@
 import Link from "next/link";
 
 import { 
-    Home, 
     Users2,
     Package, 
     Settings, 
-    ShoppingCart,  
+    LayoutGrid, 
+    ShoppingCart,
 } from "lucide-react"
 
 import { Logo } from "@/components/logo"
@@ -21,13 +21,13 @@ export const Sidebar = () => {
                         href="#"
                         className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                     >
-                        <Home className="h-5 w-5" />
+                        <LayoutGrid className="h-5 w-5" />
                         <span className="sr-only">Dashboard</span>
                     </Link>
                 </ActionTooltip>
                 <ActionTooltip name="Orders">
                     <Link
-                        href="#"
+                        href="/orders"
                         className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                     >
                         <ShoppingCart className="h-5 w-5" />
@@ -36,20 +36,11 @@ export const Sidebar = () => {
                 </ActionTooltip>
                 <ActionTooltip name="Products">
                     <Link
-                        href="#"
+                        href="/inventories"
                         className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                     >
                         <Package className="h-5 w-5" />
-                        <span className="sr-only">Products</span>
-                    </Link>
-                </ActionTooltip>
-                <ActionTooltip name="Customers">
-                    <Link
-                        href="#"
-                        className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                    >
-                        <Users2 className="h-5 w-5" />
-                        <span className="sr-only">Customers</span>
+                        <span className="sr-only">Inventories</span>
                     </Link>
                 </ActionTooltip>
             </nav>
