@@ -1,4 +1,4 @@
-
+import { PlusCircle } from "lucide-react"
 import {
   Card,
   CardTitle,
@@ -12,13 +12,15 @@ import {
   TabsContent,
 } from "@/components/ui/tabs"
 import { Sidebar } from "@/components/sidebar"
+import { Button } from "@/components/ui/button"
 import { TabLists } from "@/components/tab-list"
 import { SearchBar } from "@/components/search-bar"
 import { ModeToggle } from "@/components/mode-toggle"
-import { ActionButtons } from "@/components/action-buttons"
+import { FilterButton } from "@/components/filter-buttons"
 import { MobileSidebar } from "@/components/mobile-sidebar"
 import { AccountSettings } from "@/components/account-settings"
 import { InventoryTable } from "./_components/table/inventory-table"
+import { AddInventory } from "@/components/modal/inventory/add-inventory"
 
 
 const InventoryPage = () => {
@@ -36,7 +38,17 @@ const InventoryPage = () => {
           <Tabs defaultValue="all">
             <div className="flex items-center">
               <TabLists tabs={["inStock", "lowStock", "outOfStock"]} />
-              <ActionButtons btnName="Add Inventory" filters={["inStock", "lowStock", "outOfStock"]} />
+              <div className="ml-auto flex items-center gap-2">
+                <FilterButton filters={["inStock", "lowStock", "outOfStock"]} />
+                <AddInventory>
+                  <Button size="sm" className="h-8 gap-1">
+                    <PlusCircle className="h-3.5 w-3.5" />
+                    <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                      Add Inventory
+                    </span>
+                  </Button>
+                </AddInventory>
+              </div>
             </div>
             <TabsContent value="all">
               <Card>

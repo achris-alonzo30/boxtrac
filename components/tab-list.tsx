@@ -10,7 +10,7 @@ export const TabLists = ({ tabs }: { tabs: string[] }) => {
                 const tabName = tab.split(/(?=[A-Z])/).join(' ')
                 return (
                     <Fragment key={index}>
-                        <TabsTrigger value={tab} className="capitalize">{tabName}</TabsTrigger>
+                        <TabsTrigger value={tab} className="capitalize sm:block hidden">{tabName}</TabsTrigger>
                     </Fragment>
                 )
             })}

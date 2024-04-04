@@ -18,7 +18,6 @@ export default defineSchema({
         itemName: v.string(),
         quantity: v.number(),
         supplier: v.string(),
-        inventoryId: v.optional(v.id("_storage")),
     }),
     order: defineTable({
         size: v.string(),

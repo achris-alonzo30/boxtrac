@@ -1,10 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
-export const generateUploadUrl = mutation(async (ctx) => {
-    return await ctx.storage.generateUploadUrl();
-})
-
 export const addInventory = mutation({
   args: {
     size: v.string(),
@@ -13,7 +9,6 @@ export const addInventory = mutation({
     itemName: v.string(),
     quantity: v.number(),
     supplier: v.string(),
-    inventoryId: v.optional(v.id("_storage")),
   },
   handler: async (
     ctx,

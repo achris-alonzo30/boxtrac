@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 
 export const SearchBar = () => {
     return (
-        <div className="relative ml-auto flex-1 md:grow-0">
+        <div className="relative ml-auto flex-1 md:grow-0 items-center">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
                 type="search"

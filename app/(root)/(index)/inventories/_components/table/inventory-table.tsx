@@ -1,5 +1,3 @@
-import Image from "next/image"
-
 import {
     Table,
     TableRow,
@@ -83,15 +81,6 @@ export const InventoryTable = () => {
                                     : 'default';
                     return (
                         <TableRow key={index}>
-                            <TableCell className="hidden sm:table-cell">
-                                <Image
-                                    alt="Product image"
-                                    className="aspect-square rounded-md object-cover"
-                                    height="64"
-                                    src={item.image}
-                                    width="64"
-                                />
-                            </TableCell>
                             <TableCell className="font-medium">{item.name}</TableCell>
                             <TableCell className="font-medium">{item.size}</TableCell>
                             <TableCell><Badge variant={variant}>{item.status}</Badge></TableCell>
