@@ -9,6 +9,7 @@ import {
     DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
+import { SignOutButton } from "@clerk/nextjs"
 
 export const AccountSettings = () => {
     return (
@@ -34,7 +35,9 @@ export const AccountSettings = () => {
                 <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuItem>Support</DropdownMenuItem>
                 <DropdownMenuSeparator />
+                <SignOutButton>
                 <DropdownMenuItem>Logout</DropdownMenuItem>
+                </SignOutButton>
             </DropdownMenuContent>
         </DropdownMenu>
     )

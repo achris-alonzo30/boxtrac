@@ -68,7 +68,7 @@ export const AddInventory = ({ children }: { children: React.ReactNode }) => {
     try {
       await addInventory({
         size: values.size,
-        price: parseInt(values.price),
+        price: parseFloat(values.price),
         status: values.status,
         itemName: values.itemName,
         quantity: parseInt(values.quantity),

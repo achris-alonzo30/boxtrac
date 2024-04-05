@@ -1,9 +1,15 @@
+"use client";
 
-import { Sidebar } from "@/components/sidebar"
-import { SearchBar } from "@/components/search-bar"
-import { ModeToggle } from "@/components/mode-toggle"
-import { MobileSidebar } from "@/components/mobile-sidebar"
-import { AccountSettings } from "@/components/account-settings"
+import { 
+    SignedIn,
+    UserButton,
+    OrganizationSwitcher,   
+} from "@clerk/nextjs";
+import { Sidebar } from "@/components/sidebar";
+import { ModeToggle } from "@/components/mode-toggle";
+import { MobileSidebar } from "@/components/mobile-sidebar";
+import { AccountSettings } from "@/components/account-settings";
+
 
 const DashboardPage = () => {
     return (
@@ -12,9 +18,21 @@ const DashboardPage = () => {
             <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
                 <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
                     <MobileSidebar />
-                    <SearchBar />
-                    <ModeToggle />
-                    <AccountSettings />
+                    <SignedIn>
+                        <div className="relative ml-auto flex-1 md:grow-0 items-center">
+                            <OrganizationSwitcher 
+                            afterCreateOrganizationUrl={"/dashboard"}
+                            appearance={{
+                                elements: {
+                                    organizationPreviewTextContainer: "text-[#2ca9bc]",
+                                    userPreviewTextContainer: "text-[#2ca9bc]",
+                                    organizationSwitcherPopoverCard: "bg-white",
+                                },
+                            }} />
+                        </div>
+                        <ModeToggle />
+                        <UserButton afterSignOutUrl="/" />
+                    </SignedIn>
                 </header>
             </div>
         </div>

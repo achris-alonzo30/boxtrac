@@ -3,8 +3,8 @@
 import { z } from "zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useSignIn } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
+import { useSignIn, useUser } from "@clerk/nextjs";
+import { useRouter, redirect } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
@@ -32,6 +32,7 @@ import { useToast } from "@/components/ui/use-toast";
 export const SignInScreen = () => {
   const router = useRouter();
   const { toast } = useToast();
+  const { isSignedIn  } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const { isLoaded, signIn, setActive } = useSignIn();
 
@@ -43,6 +44,8 @@ export const SignInScreen = () => {
     },
   })
 
+  if (isSignedIn) return redirect("/dashboard")
+
   // start the sign up process.
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     if (!isLoaded) return;
@@ -50,20 +53,22 @@ export const SignInScreen = () => {
     setIsLoading(true);
     try {
       const { emailAddress, password } = values;
+      console.log(emailAddress, password)
       const res = await signIn.create({
         identifier: emailAddress,
         password,
       });
 
+      
+
       if (res.status === "complete") {
+        console.log(res)
         await setActive({ session: res.createdSessionId })
         // create user in the backend
         router.push("/dashboard");
       } else {
         console.log(res)
       }
-
-
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
       toast({
@@ -76,13 +81,15 @@ export const SignInScreen = () => {
     }
   };
 
+  
+
   return (
     <div>
       <Card className="mx-auto max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">Sign Up</CardTitle>
+          <CardTitle className="text-2xl">Sign In</CardTitle>
           <CardDescription>
-            Enter your information to create an account
+            Enter your information to login to your account.
           </CardDescription>
         </CardHeader>
         <CardContent>

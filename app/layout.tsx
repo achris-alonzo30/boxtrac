@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ClerkProvider>
+
         <ConvexClientProvider>
           <ThemeProvider
             attribute="class"
@@ -34,7 +34,7 @@ export default function RootLayout({
             <Toaster />
           </ThemeProvider>
         </ConvexClientProvider>
-        </ClerkProvider>
+
       </body>
     </html>
   );

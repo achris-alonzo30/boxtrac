@@ -1,4 +1,5 @@
 
+import Link from "next/link";
 import {
     DropdownMenu,
     DropdownMenuItem,
@@ -6,10 +7,11 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"  
+import { Button } from "@/components/ui/button"
 import { MoreHorizontal } from "lucide-react"
+import { Id } from "@/convex/_generated/dataModel";
 
-export const InventoryActions = () => {
+export const InventoryActions = ({ itemId }: { itemId: Id<"inventory"> }) => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -24,7 +26,10 @@ export const InventoryActions = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem>Edit</DropdownMenuItem>
+                <Link href={`/inventories/edit/${itemId}`} className="cursor-pointer">
+                    <DropdownMenuItem>
+                        Edit
+                    </DropdownMenuItem></Link>
                 <DropdownMenuItem>Delete</DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

@@ -37,7 +37,7 @@ export const SignUpScreen = () => {
   const { isLoaded, signUp, setActive } = useSignUp();
   const [pendingVerification, setPendingVerification] = useState(false);
   
-  const createUser = useMutation(api.users.createUser);
+  // const createUser = useMutation(api.users.createUser);
 
   const registerForm = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -102,14 +102,14 @@ export const SignUpScreen = () => {
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId })
         const { firstName, lastName, emailAddress, createdUserId } = completeSignUp;
-        if (firstName && lastName && emailAddress && createdUserId) {
-          await createUser({
-            firstName,
-            lastName,
-            emailAddress,
-            userId: createdUserId
-          });
-        }
+        // if (firstName && lastName && emailAddress && createdUserId) {
+        //   await createUser({
+        //     firstName,
+        //     lastName,
+        //     emailAddress,
+        //     userId: createdUserId
+        //   });
+        // }
         router.push("/dashboard");
       }
     } catch (err: any) {

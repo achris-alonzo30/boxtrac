@@ -7,6 +7,7 @@ import {
     Settings, 
     LayoutGrid, 
     ShoppingCart,
+    ScrollText,
 } from "lucide-react"
 
 import { Logo } from "@/components/logo"
@@ -15,6 +16,8 @@ import { cn } from "@/lib/utils";
 
 export const Sidebar = () => {
     const pathname = usePathname()
+
+    const admin = true;
 
     return (
         <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
@@ -45,6 +48,16 @@ export const Sidebar = () => {
                     >
                         <Package className="h-5 w-5" />
                         <span className="sr-only">Inventories</span>
+                    </Link>
+                </ActionTooltip>
+                <ActionTooltip name="Logs">
+                    <Link
+                        href="/logs"
+                        className={cn("flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8", pathname === "/inventories" && "bg-accent text-accent-foreground")}
+                    >
+                        <ScrollText className="h-5 w-5" />
+                        <span className="sr-only">Logs</span>
+                        {/* Add the number of logs in here */}
                     </Link>
                 </ActionTooltip>
             </nav>
