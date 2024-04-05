@@ -1,20 +1,22 @@
 
-import { 
+import {
     Link,
     Package,
-    LineChart,  
-    PanelLeft, 
+    LineChart,
+    PanelLeft,
+    LayoutGrid,
+    ScrollText,
     ShoppingCart,
-    LayoutGrid,  
-} from "lucide-react"
+    GitPullRequest,
+} from "lucide-react";
 
-import { 
-    Sheet, 
-    SheetContent, 
+import {
+    Sheet,
+    SheetContent,
     SheetTrigger,
-} from "@/components/ui/sheet"
-import { Logo } from "@/components/logo"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/sheet";
+import { Logo } from "@/components/logo";
+import { Button } from "@/components/ui/button";
 
 
 
@@ -50,6 +52,21 @@ export const MobileSidebar = () => {
                     >
                         <Package className="h-5 w-5" />
                         Inventories
+                    </Link>
+                    <Link
+                        href="/requests"
+                        className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                    >
+                        <GitPullRequest className="h-5 w-5" />
+                        <span className="sr-only">Requests</span>
+                        {/* Add the number of requests in here */}
+                    </Link>
+                    <Link
+                        href="/logs"
+                        className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                    >
+                        <ScrollText className="h-5 w-5" />
+                        <span className="sr-only">Logs</span>
                     </Link>
                     <Link
                         href="#"

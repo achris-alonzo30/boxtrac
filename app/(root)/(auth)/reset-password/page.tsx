@@ -36,7 +36,7 @@ import { Input } from '@/components/ui/input';
 
 
 
-export const ForgotPasswordPage: NextPage = () => {
+const ForgotPasswordPage: NextPage = () => {
     const router = useRouter();
     const { isSignedIn } = useAuth();
     const [error, setError] = useState('');
@@ -226,3 +226,5 @@ export const ForgotPasswordPage: NextPage = () => {
         </>
     );
 };
+
+export default ForgotPasswordPage;

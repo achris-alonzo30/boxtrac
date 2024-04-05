@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useQuery } from "convex/react";
 import { formatRelative } from "date-fns";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { api } from "@/convex/_generated/api";
 import { transformStockText } from "@/lib/utils";
 
@@ -23,16 +23,28 @@ import { Button } from "@/components/ui/button";
 import { InventoryActions } from "./inventory-actions";
 import { InventoryTableHeads } from "./inventory-table-heads";
 
+import { useOrganization, useUser } from "@clerk/nextjs";
 
 export const InventoryTable = () => {
+    
     const router = useRouter();
-    const inventories = useQuery(api.inventories.getInventories);
+    
+    const { user, isLoaded: userIsLoaded, isSignedIn } = useUser();
+    const { organization, isLoaded: orgIsLoaded } = useOrganization();
+    let orgId: string | undefined = undefined;
+    if (orgIsLoaded && userIsLoaded) {
+        orgId = organization?.id ?? user?.id;
+    }
+ 
+    const inventories = useQuery(api.inventories.getInventories, orgId ? { orgId } : "skip");
+
+    if (!isSignedIn) redirect("/");
 
     if (!inventories) return <Loader text="Loading Your Inventories" />;
 
     return (
         <>
-            {inventories.length > 0 ? (
+            {inventories && inventories.length > 0 ? (
                 <Table>
                     <TableHeader>
                         <InventoryTableHeads />
@@ -55,7 +67,7 @@ export const InventoryTable = () => {
                                     <TableCell className="hidden md:table-cell">{item.quantity}</TableCell>
                                     <TableCell className="hidden md:table-cell">₱{item.price}</TableCell>
                                     <TableCell className="font-medium">{item.supplier}</TableCell>
-                                    <TableCell className="hidden md:table-cell">{formatRelative(new Date(item._creationTime), new Date())}</TableCell>
+                                    <TableCell className="hidden md:table-cell capitalize">{formatRelative(new Date(item._creationTime), new Date())}</TableCell>
                                     <TableCell>
                                         <InventoryActions itemId={item._id} />
                                     </TableCell>

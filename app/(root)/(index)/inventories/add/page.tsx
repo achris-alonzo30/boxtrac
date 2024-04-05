@@ -2,9 +2,9 @@
 
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { useMutation } from "convex/react";
-import { useRouter } from "next/navigation";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import { redirect, useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useOrganization, useUser } from "@clerk/nextjs";
 
@@ -48,6 +48,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { ModeToggle } from "@/components/mode-toggle";
 import { MobileSidebar } from "@/components/mobile-sidebar";
 import { AccountSettings } from "@/components/account-settings";
+import { OrganizationMembership } from "@clerk/nextjs/server";
 
 
 const formSchema = z.object({
@@ -61,18 +62,22 @@ const formSchema = z.object({
 
 
 const AddInventoryPage = () => {
-  const user = useUser();
+  const { user, isLoaded: userIsLoaded, isSignedIn } = useUser();
   const router = useRouter();
   const { toast } = useToast();
-  const organization = useOrganization();
+  const { organization, isLoaded: orgIsLoaded, membership } = useOrganization();
+
+  if (!isSignedIn && !userIsLoaded) redirect("/")
 
   let orgId: string | undefined = undefined;
-  if (organization.isLoaded && user.isLoaded) {
-    orgId = organization.organization?.id ?? user.user?.id;
+  if (orgIsLoaded && userIsLoaded) {
+    orgId = organization?.id ?? user?.id;
   }
 
+  const role = membership?.role ?? "";
   const addInventory = useMutation(api.inventories.addInventory);
-
+  const addToStagingArea = useMutation(api.stagingArea.addToStagingArea)
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -88,15 +93,37 @@ const AddInventoryPage = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!orgId) return;
     try {
-      await addInventory({
-        orgId,
-        size: values.size,
-        status: values.status,
-        itemName: values.itemName,
-        supplier: values.supplier,
-        price: parseFloat(values.price),
-        quantity: parseInt(values.quantity),
-      })
+      if (role === "org:admin") {
+        await addInventory({
+          orgId,
+          size: values.size,
+          status: values.status,
+          itemName: values.itemName,
+          supplier: values.supplier,
+          price: parseFloat(values.price),
+          quantity: parseInt(values.quantity),
+        })
+      } else if (role === "org:member") {
+
+        await addToStagingArea({
+          orgId,
+          action: "[STAFF] Add New Item in Inventory",
+          data: {
+            dataType: "Inventory",
+            inventoryData: {
+              size: values.size,
+              status: values.status,
+              itemName: values.itemName,
+              supplier: values.supplier,
+              price: parseFloat(values.price),
+              quantity: parseInt(values.quantity),
+            }
+          }
+        })
+      } else {
+        return null;
+      }
+      
     } catch (error) {
       console.error(JSON.stringify(error, null, 2));
       toast({
@@ -228,7 +255,6 @@ const AddInventoryPage = () => {
                                   name="quantity"
                                   render={({ field }) => (
                                     <FormItem>
-                                      <FormLabel>Quantity</FormLabel>
                                       <FormControl>
                                         <Input id="quantity" min="0" placeholder="99" type="number" {...field} />
                                       </FormControl>
@@ -243,7 +269,6 @@ const AddInventoryPage = () => {
                                   name="price"
                                   render={({ field }) => (
                                     <FormItem>
-                                      <FormLabel>Item Size</FormLabel>
                                       <FormControl>
                                         <div className="flex items-center gap-x-2">
                                           ₱
@@ -262,7 +287,6 @@ const AddInventoryPage = () => {
                                   name="size"
                                   render={({ field }) => (
                                     <FormItem>
-                                      <FormLabel>Item Size</FormLabel>
                                       <FormControl>
                                         <Input placeholder="Enter size..."  {...field} required />
                                       </FormControl>

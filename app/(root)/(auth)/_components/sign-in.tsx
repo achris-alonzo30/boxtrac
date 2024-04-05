@@ -53,7 +53,6 @@ export const SignInScreen = () => {
     setIsLoading(true);
     try {
       const { emailAddress, password } = values;
-      console.log(emailAddress, password)
       const res = await signIn.create({
         identifier: emailAddress,
         password,
@@ -62,7 +61,6 @@ export const SignInScreen = () => {
       
 
       if (res.status === "complete") {
-        console.log(res)
         await setActive({ session: res.createdSessionId })
         // create user in the backend
         router.push("/dashboard");

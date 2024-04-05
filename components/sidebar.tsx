@@ -1,18 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from 'next/navigation'
-import { 
-    Package, 
-    Settings, 
-    LayoutGrid, 
-    ShoppingCart,
-    ScrollText,
-} from "lucide-react"
-
-import { Logo } from "@/components/logo"
-import { ActionTooltip } from "@/components/action-tooltip"
 import { cn } from "@/lib/utils";
+import { usePathname } from 'next/navigation';
+
+import {
+    Package,
+    Settings,
+    ScrollText,
+    LayoutGrid,
+    ShoppingCart,
+    GitPullRequest,
+} from "lucide-react";
+
+import { Logo } from "@/components/logo";
+import { ActionTooltip } from "@/components/action-tooltip";
+
 
 export const Sidebar = () => {
     const pathname = usePathname()
@@ -50,16 +53,29 @@ export const Sidebar = () => {
                         <span className="sr-only">Inventories</span>
                     </Link>
                 </ActionTooltip>
-                <ActionTooltip name="Logs">
-                    <Link
-                        href="/logs"
-                        className={cn("flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8", pathname === "/inventories" && "bg-accent text-accent-foreground")}
-                    >
-                        <ScrollText className="h-5 w-5" />
-                        <span className="sr-only">Logs</span>
-                        {/* Add the number of logs in here */}
-                    </Link>
-                </ActionTooltip>
+                {admin && (
+                    <ActionTooltip name="Requests">
+                        <Link
+                            href="/requests"
+                            className={cn("flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8", pathname === "/inventories" && "bg-accent text-accent-foreground")}
+                        >
+                            <GitPullRequest className="h-5 w-5" />
+                            <span className="sr-only">Requests</span>
+                            {/* Add the number of requests in here */}
+                        </Link>
+                    </ActionTooltip>
+                )}
+                {admin && (
+                    <ActionTooltip name="Logs">
+                        <Link
+                            href="/logs"
+                            className={cn("flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8", pathname === "/inventories" && "bg-accent text-accent-foreground")}
+                        >
+                            <ScrollText className="h-5 w-5" />
+                            <span className="sr-only">Logs</span>
+                        </Link>
+                    </ActionTooltip>
+                )}
             </nav>
             <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
                 <ActionTooltip name="Settings">
