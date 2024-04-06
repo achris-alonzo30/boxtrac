@@ -1,6 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import {
-  mutation,
+
   query,
   internalMutation,
   QueryCtx,

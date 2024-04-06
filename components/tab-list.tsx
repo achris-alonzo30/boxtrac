@@ -14,7 +14,6 @@ export const TabLists = ({ tabs }: { tabs: string[] }) => {
                     </Fragment>
                 )
             })}
-
         </TabsList>
     )
 }

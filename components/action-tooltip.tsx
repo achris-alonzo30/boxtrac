@@ -1,6 +1,4 @@
 
-import Link from "next/link";
-
 import { 
     Tooltip,
     TooltipContent,
@@ -12,7 +10,6 @@ type ActionTooltipProps = {
     children: React.ReactNode;
     name: string;
 }
-
 
 export const ActionTooltip = ({ children, name }: ActionTooltipProps ) => {
     return (

@@ -113,6 +113,7 @@ export default defineSchema({
       orderData: orderData,
       inventoryData: inventoryData,
     }),
+    inventoryId: v.optional(v.id("inventory")),
   }).index("byOrgId", ["orgId"]),
 
 });

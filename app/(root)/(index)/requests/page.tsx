@@ -1,11 +1,26 @@
+"use client";
 
+import { redirect } from "next/navigation";
+import { useConvexAuth } from "convex/react";
+
+import { Loader } from "@/components/loader";
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
 import { SearchBar } from "@/components/search-bar";
 import { FilterButton } from "@/components/filter-buttons";
 import { RequestsScreen } from "./_components/card-requests-container";
 
+
+
+
 const LogsPage = () => {
+  const { isAuthenticated, isLoading } = useConvexAuth();
+
+  if (isLoading) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
+
+  if (!isAuthenticated) {
+    redirect("/");
+  }
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <Sidebar />

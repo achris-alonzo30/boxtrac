@@ -1,13 +1,15 @@
 "use client";
 
 import { z } from "zod";
-import { use, useEffect } from "react";
+import { useEffect } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
+import { redirect, useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 
 import {
   Loader2,
@@ -44,18 +46,12 @@ import {
   SelectContent,
   SelectTrigger,
 } from "@/components/ui/select";
+import { Header } from "@/components/header";
 import { Loader } from "@/components/loader";
 import { Input } from "@/components/ui/input";
 import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
-import { SearchBar } from "@/components/search-bar";
 import { useToast } from "@/components/ui/use-toast";
-import { ModeToggle } from "@/components/mode-toggle";
-import { MobileSidebar } from "@/components/mobile-sidebar";
-import { AccountSettings } from "@/components/account-settings";
-
-
-
 
 const formSchema = z.object({
   size: z.string().min(1),
@@ -66,17 +62,29 @@ const formSchema = z.object({
   quantity: z.string().min(1),
 })
 
+export default function EditInventoryPage({ params }: { params: { itemId: Id<"inventory"> } }) {
+  const { orgRole, orgId, isSignedIn } = useAuth();
 
-export default function EditInventoryPage ({ params }: { params: { itemId: Id<"inventory"> }}) {
   const router = useRouter();
   const { toast } = useToast();
 
-  const item = useQuery(api.inventories.itemToEdit, { itemId: params.itemId })
-  
-  const updateInventory = useMutation(api.inventories.updateInventory);
+  const role = orgRole ?? "skip";
 
-  console.log(item)
-  
+  const addToStagingArea = useMutation(api.stagingArea.addToStagingArea);
+  const updateInventory = useMutation(api.inventories.updateItemToInventory);
+  const item = useQuery(api.inventories.itemToEdit, { itemId: params.itemId });
+  useEffect(() => {
+    // Update the form default values when 'item' changes
+    form.reset({
+      size: item?.size || '',
+      price: item?.price ? String(item.price) : '',
+      status: item?.status || '',
+      quantity: item?.quantity ? String(item.quantity) : '',
+      itemName: item?.itemName || '',
+      supplier: item?.supplier || '',
+    });
+  }, [item]);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -89,33 +97,65 @@ export default function EditInventoryPage ({ params }: { params: { itemId: Id<"i
     }
   })
 
-  useEffect(() => {
-    // Update the form default values when 'item' changes
-    form.reset({
-      size: item?.size || '',
-      price: item?.price ? String(item.price) : '',
-      status: item?.status || '',
-      quantity: item?.quantity ? String(item.quantity) : '',
-      itemName: item?.itemName || '',
-      supplier: item?.supplier || '',
-    });
-  }, [form, item]);
-
-  if (!item) return <div className="flex h-screen items-center justify-center"><Loader text="Loading Your Item" /></div>; 
-
-  const isLoading = form.formState.isSubmitting;
+  const isLoading = item === undefined;
+  const isSubmitting = form.formState.isSubmitting;
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values)
+    if (!orgId) return;
     try {
-      await updateInventory({ 
-        id: params.itemId,
-        size: values.size,
-        price: parseFloat(values.price),
-        status: values.status,
-        itemName: values.itemName,
-        quantity: parseInt(values.quantity),
-        supplier: values.supplier, 
-      })
+      if (role === "org:admin") {
+        const res = await updateInventory({
+          id: params.itemId,
+          size: values.size,
+          price: parseFloat(values.price),
+          status: values.status,
+          itemName: values.itemName,
+          quantity: parseInt(values.quantity),
+          supplier: values.supplier,
+        })
+
+        if (res.success === true) {
+          toast({
+            description: "Item updated successfully.",
+            variant: "success",
+            title: "Success",
+          })
+          router.push("/inventories")
+        } else {
+          toast({
+            description: "Failed to update item. Please try again.",
+            variant: "destructive",
+            title: "Error",
+          })
+        }
+
+      } else if (role === "org:member") {
+        const res = await addToStagingArea({
+          orgId,
+          inventoryId: params.itemId,
+          action: "[STAFF] Update Item in Inventory",
+          data: {
+            dataType: "Inventory",
+            inventoryData: {
+              size: values.size,
+              price: parseFloat(values.price),
+              status: values.status,
+              itemName: values.itemName,
+              quantity: parseInt(values.quantity),
+              supplier: values.supplier,
+            }
+          }
+        });
+
+        if (res) {
+          toast({
+            title: "Request Sent",
+            description: "Your request has been sent and is pending for approval",
+            variant: "default",
+          })
+          router.push("/inventories")
+        }
+      }
+
     } catch (error) {
       console.error(JSON.stringify(error, null, 2));
       toast({
@@ -125,24 +165,16 @@ export default function EditInventoryPage ({ params }: { params: { itemId: Id<"i
       })
     } finally {
       form.reset();
-      toast({
-        description: "Item added successfully.",
-        variant: "success",
-        title: "Success",
-      })
-      router.push("/inventories")
     }
   }
+
+  if (!isSignedIn) redirect("/")
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <Sidebar />
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          <MobileSidebar />
-          <SearchBar />
-          <ModeToggle />
-          <AccountSettings />
-        </header>
+        <Header />
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
@@ -153,7 +185,7 @@ export default function EditInventoryPage ({ params }: { params: { itemId: Id<"i
                     <span className="sr-only">Back</span>
                   </Button>
                   <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
-                    Add Inventory
+                    Update Inventory
                   </h1>
                   <div className="hidden items-center gap-2 md:ml-auto md:flex">
                     <Button
@@ -163,20 +195,20 @@ export default function EditInventoryPage ({ params }: { params: { itemId: Id<"i
                         form.reset();
                         router.back();
                       }}
-                      disabled={isLoading}
-                      >
+                      disabled={isSubmitting}
+                    >
                       Cancel
                     </Button>
-                    <Button size="sm" disabled={isLoading}>
-                    {isLoading ? (
-                  <span className="flex items-center gap-x-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading...
-                  </span>
-                ) : (
-                  <p>Update Product</p>
-                )}
-                      </Button>
+                    <Button size="sm" disabled={isSubmitting} type="submit">
+                      {isSubmitting ? (
+                        <span className="flex items-center gap-x-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Loading...
+                        </span>
+                      ) : (
+                        <p>Update Product</p>
+                      )}
+                    </Button>
                   </div>
                 </div>
                 <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
@@ -189,6 +221,7 @@ export default function EditInventoryPage ({ params }: { params: { itemId: Id<"i
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
+                        {isLoading && <Loader text="Loading Product" />}
                         <div className="grid gap-6">
                           <div className="grid gap-3">
                             <FormField
@@ -376,27 +409,27 @@ export default function EditInventoryPage ({ params }: { params: { itemId: Id<"i
                   </div>
                 </div>
                 <div className="flex justify-end items-center gap-2 md:hidden">
-                <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        form.reset();
-                        router.back();
-                      }}
-                      disabled={isLoading}
-                      >
-                      Cancel
-                    </Button>
-                    <Button size="sm" disabled={isLoading}>
-                    {isLoading ? (
-                  <span className="flex items-center gap-x-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading...
-                  </span>
-                ) : (
-                  <p>Update Product</p>
-                )}
-                      </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      form.reset();
+                      router.back();
+                    }}
+                    disabled={isSubmitting}
+                  >
+                    Cancel
+                  </Button>
+                  <Button size="sm" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-x-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Loading...
+                      </span>
+                    ) : (
+                      <p>Update Product</p>
+                    )}
+                  </Button>
                 </div>
               </div>
             </main>

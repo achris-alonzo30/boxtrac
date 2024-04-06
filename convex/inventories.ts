@@ -7,7 +7,7 @@ import { internal } from "./_generated/api";
 // ######################## MUTATIONS #############################
 // ################################################################
 
-export const addInventory = mutation({
+export const addItemToInventory = mutation({
   args: {
     size: v.string(),
     orgId: v.string(),
@@ -24,7 +24,7 @@ export const addInventory = mutation({
     const hasAccess = await orgAccess(orgId, ctx);
 
     if (!hasAccess)
-      throw new ConvexError("You do not have access to this organization");
+      throw new ConvexError("[ADD_INVENTORY] You do not have access to this organization");
 
     const inventoryId = await ctx.db.insert("inventory", {
       size,
@@ -42,11 +42,14 @@ export const addInventory = mutation({
         action: "Add New Item in Inventory",
         inventoryId,
       })
-    }
+
+      return { status: "complete"}
+    } 
+
   },
 });
 
-export const updateInventory = mutation({
+export const updateItemToInventory = mutation({
   args: {
     id: v.id("inventory"),
     size: v.optional(v.string()),
@@ -60,16 +63,49 @@ export const updateInventory = mutation({
     ctx,
     { id, size, price, status, itemName, quantity, supplier }
   ) => {
-    return await ctx.db.patch(id, {
-      size,
-      price,
-      status,
-      itemName,
-      quantity,
-      supplier,
-    });
+    const item = await inventoryAccess(id, ctx);
+
+    if (!item) throw new ConvexError("[UPDATE_INVENTORY]: Inventory not found");
+    
+    try {
+      await ctx.db.patch(id, {
+        size,
+        price,
+        status,
+        itemName,
+        quantity,
+        supplier,
+      });
+      return { success: true}
+    } catch(error) {
+      console.error(JSON.stringify(error, null, 2));
+      return { success: false}
+    }
+    
+
   },
 });
+
+export const deleteItemToInventory = mutation({
+  args: {
+    itemId: v.id("inventory"),
+  },
+  handler: async (ctx, { itemId }) => {
+    const item = await inventoryAccess(itemId, ctx);
+
+    if (!item) throw new ConvexError("[DELETE_INVENTORY]: Inventory not found");
+
+    try {
+      await ctx.db.delete(itemId);
+
+      return { success: true};
+    } catch (error) {
+      console.error(JSON.stringify(error, null, 2));
+      return { success: false}
+    }
+
+  }
+})
 
 // ################################################################
 // ######################### Queries ##############################
@@ -94,6 +130,10 @@ export const getInventories = query({
 export const itemToEdit = query({
   args: { itemId: v.id("inventory") },
   handler: async (ctx, { itemId }) => {
+    const item = await inventoryAccess(itemId, ctx);
+
+    if (!item) throw new ConvexError("[ITEM_TO_EDIT]: Inventory not found");
+
     return await ctx.db.get(itemId);
   },
 });

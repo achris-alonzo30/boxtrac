@@ -12,9 +12,9 @@ export const RequestsScreen = () => {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Logs</CardTitle>
+                <CardTitle>Requests</CardTitle>
                 <CardDescription>
-                    Manage and keep track of your inventory.
+                    Here are all the requests from your staffs.
                 </CardDescription>
             </CardHeader>
             <CardContent>

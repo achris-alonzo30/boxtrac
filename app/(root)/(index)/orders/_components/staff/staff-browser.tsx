@@ -10,17 +10,12 @@ import {
   Tabs,
   TabsContent,
 } from "@/components/ui/tabs"
-import { Sidebar } from "@/components/sidebar"
-import { SearchBar } from "@/components/search-bar"
-
-import { ModeToggle } from "@/components/mode-toggle"
-import { ActionButtons } from "@/components/action-buttons"
-import { MobileSidebar } from "@/components/mobile-sidebar"
-import { AccountSettings } from "@/components/account-settings"
-
-
+import { Header } from "@/app/(root)/(index)/_components/header"
+import { Sidebar } from "@/app/(root)/(index)/_components/sidebar"
 import { TabLists } from "@/components/tab-list"
+import { ActionButtons } from "@/components/action-buttons"
 import { StaffOrdersTable } from "./staff-table/staff-orders-table"
+
 
 
 
@@ -29,12 +24,7 @@ export const StaffBrowser = () => {
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <Sidebar />
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          <MobileSidebar />
-          <SearchBar />
-          <ModeToggle />
-          <AccountSettings />
-        </header>
+        <Header />
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
           <Tabs defaultValue="all">
             <div className="flex items-center">

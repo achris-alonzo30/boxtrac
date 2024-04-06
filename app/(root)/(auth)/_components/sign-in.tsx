@@ -3,8 +3,8 @@
 import { z } from "zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useSignIn, useUser } from "@clerk/nextjs";
-import { useRouter, redirect } from "next/navigation";
+import { useSignIn } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
@@ -30,11 +30,11 @@ import { useToast } from "@/components/ui/use-toast";
 
 
 export const SignInScreen = () => {
-  const router = useRouter();
-  const { toast } = useToast();
-  const { isSignedIn  } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const { isLoaded, signIn, setActive } = useSignIn();
+
+  const router = useRouter();
+  const { toast } = useToast();
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -43,9 +43,6 @@ export const SignInScreen = () => {
       password: "",
     },
   })
-
-  if (isSignedIn) return redirect("/dashboard")
-
   // start the sign up process.
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     if (!isLoaded) return;
@@ -58,12 +55,11 @@ export const SignInScreen = () => {
         password,
       });
 
-      
-
       if (res.status === "complete") {
         await setActive({ session: res.createdSessionId })
         // create user in the backend
         router.push("/dashboard");
+        setIsLoading(false);
       } else {
         console.log(res)
       }
@@ -74,12 +70,8 @@ export const SignInScreen = () => {
         description: "Something went wrong. Please try again.",
         variant: "destructive",
       })
-    } finally {
-      setIsLoading(false);
-    }
+    } 
   };
-
-  
 
   return (
     <div>
@@ -130,6 +122,7 @@ export const SignInScreen = () => {
               </div>
             </form>
           </Form>
+          
         </CardContent>
       </Card>
     </div>

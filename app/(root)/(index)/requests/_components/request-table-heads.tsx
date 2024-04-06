@@ -4,7 +4,7 @@ export const RequestTableHeads = () => {
     return (
         <TableRow>
             <TableHead>Date</TableHead>
-            <TableHead>Date Type</TableHead>
+            <TableHead>Data Type</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Actions</TableHead>
         </TableRow>

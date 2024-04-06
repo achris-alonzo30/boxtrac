@@ -4,9 +4,7 @@ import { z } from "zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSignUp } from "@clerk/nextjs";
-import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
-import { api } from "@/convex/_generated/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, verifyAccountSchema } from "./types";
 
@@ -31,13 +29,14 @@ import { useToast } from "@/components/ui/use-toast";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 
 export const SignUpScreen = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [pendingVerification, setPendingVerification] = useState(false);
+
+  const { isLoaded, signUp, setActive } = useSignUp();
+  
   const router = useRouter();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
-  const { isLoaded, signUp, setActive } = useSignUp();
-  const [pendingVerification, setPendingVerification] = useState(false);
-  
-  // const createUser = useMutation(api.users.createUser);
+
 
   const registerForm = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -72,7 +71,6 @@ export const SignUpScreen = () => {
       // send the email.
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
 
-
       setPendingVerification(true);
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
@@ -101,15 +99,7 @@ export const SignUpScreen = () => {
       }
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId })
-        const { firstName, lastName, emailAddress, createdUserId } = completeSignUp;
-        // if (firstName && lastName && emailAddress && createdUserId) {
-        //   await createUser({
-        //     firstName,
-        //     lastName,
-        //     emailAddress,
-        //     userId: createdUserId
-        //   });
-        // }
+        
         router.push("/dashboard");
       }
     } catch (err: any) {

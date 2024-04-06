@@ -1,5 +1,3 @@
-"use client";
-
 import { 
     SignedIn, 
     UserButton, 
@@ -28,6 +26,7 @@ export const Header = () => {
                 <ModeToggle />
                 <UserButton afterSignOutUrl="/" />
             </SignedIn>
+            
         </header>
     )
 }

@@ -12,8 +12,9 @@ export const addToStagingArea = mutation({
       inventoryData: inventoryData,
       orderData: orderData,
     }),
+    inventoryId: v.optional(v.id("inventory")),
   },
-  handler: async (ctx, { orgId, action, data }) => {
+  handler: async (ctx, { orgId, action, data, inventoryId }) => {
     const hasAccess = await orgAccess(orgId, ctx);
 
     if (!hasAccess)
@@ -25,6 +26,7 @@ export const addToStagingArea = mutation({
       orgId,
       action,
       data,
+      inventoryId
     });
   },
 });
@@ -49,3 +51,23 @@ export const getItemsInStagingArea = query({
       .collect();
   },
 });
+
+export const clear = mutation({
+  args: {
+    itemId: v.id("stagingArea"),
+  },
+  handler: async (ctx, { itemId }) => {
+    const itemToDelete = await ctx.db.get(itemId);
+
+    if (!itemToDelete) throw new ConvexError("[CLEAR]: Item not found");
+
+    try {
+      await ctx.db.delete(itemId)
+
+      return { success: true}
+    } catch (error) {
+      console.error(JSON.stringify(error, null, 2));
+      return { success: false}
+    }
+  }
+})

@@ -1,12 +1,13 @@
 "use client";
 
 import { z } from "zod";
+import { useAuth } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { redirect, useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useOrganization, useUser } from "@clerk/nextjs";
+
 
 import { Loader2, ChevronLeft } from "lucide-react"
 
@@ -40,16 +41,11 @@ import {
   SelectContent,
   SelectTrigger,
 } from "@/components/ui/select";
+import { Header } from "@/components/header";
 import { Input } from "@/components/ui/input";
 import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
-import { SearchBar } from "@/components/search-bar";
 import { useToast } from "@/components/ui/use-toast";
-import { ModeToggle } from "@/components/mode-toggle";
-import { MobileSidebar } from "@/components/mobile-sidebar";
-import { AccountSettings } from "@/components/account-settings";
-import { OrganizationMembership } from "@clerk/nextjs/server";
-
 
 const formSchema = z.object({
   size: z.string().min(1),
@@ -60,23 +56,15 @@ const formSchema = z.object({
   quantity: z.string().min(1),
 })
 
-
 const AddInventoryPage = () => {
-  const { user, isLoaded: userIsLoaded, isSignedIn } = useUser();
+  const { orgRole, orgId, isSignedIn } = useAuth();
+
   const router = useRouter();
   const { toast } = useToast();
-  const { organization, isLoaded: orgIsLoaded, membership } = useOrganization();
 
-  if (!isSignedIn && !userIsLoaded) redirect("/")
-
-  let orgId: string | undefined = undefined;
-  if (orgIsLoaded && userIsLoaded) {
-    orgId = organization?.id ?? user?.id;
-  }
-
-  const role = membership?.role ?? "";
-  const addInventory = useMutation(api.inventories.addInventory);
-  const addToStagingArea = useMutation(api.stagingArea.addToStagingArea)
+  const role = orgRole ?? "skip";
+  const addInventory = useMutation(api.inventories.addItemToInventory);
+  const addToStagingArea = useMutation(api.stagingArea.addToStagingArea);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -94,7 +82,7 @@ const AddInventoryPage = () => {
     if (!orgId) return;
     try {
       if (role === "org:admin") {
-        await addInventory({
+        const res = await addInventory({
           orgId,
           size: values.size,
           status: values.status,
@@ -103,9 +91,18 @@ const AddInventoryPage = () => {
           price: parseFloat(values.price),
           quantity: parseInt(values.quantity),
         })
+
+        if (res) {
+          toast({
+            title: "Success",
+            description: "Item added to inventory",
+            variant: "default",
+          })
+          router.push("/inventories")
+        } 
       } else if (role === "org:member") {
 
-        await addToStagingArea({
+        const res = await addToStagingArea({
           orgId,
           action: "[STAFF] Add New Item in Inventory",
           data: {
@@ -119,7 +116,16 @@ const AddInventoryPage = () => {
               quantity: parseInt(values.quantity),
             }
           }
-        })
+        });
+
+        if (res) {
+          toast({
+            title: "Request Sent",
+            description: "Your request has been sent and is pending forapproval",
+            variant: "default",
+          })
+          router.push("/inventories")
+        } 
       } else {
         return null;
       }
@@ -141,16 +147,14 @@ const AddInventoryPage = () => {
       router.push("/inventories")
     }
   }
+
+  if (!isSignedIn) redirect("/")
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <Sidebar />
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-          <MobileSidebar />
-          <SearchBar />
-          <ModeToggle />
-          <AccountSettings />
-        </header>
+        <Header />
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
@@ -161,7 +165,7 @@ const AddInventoryPage = () => {
                     <span className="sr-only">Back</span>
                   </Button>
                   <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
-                    Add Inventory
+                    Add New Item to Inventory
                   </h1>
                   <div className="hidden items-center gap-2 md:ml-auto md:flex">
                     <Button
@@ -175,16 +179,16 @@ const AddInventoryPage = () => {
                       >
                       Cancel
                     </Button>
-                    <Button size="sm" disabled={isLoading}>
-                    {isLoading ? (
-                  <span className="flex items-center gap-x-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading...
-                  </span>
-                ) : (
-                  <p>Add Product</p>
-                )}
-                      </Button>
+                    <Button size="sm" disabled={isLoading} type="submit">
+                      {isLoading ? (
+                        <span className="flex items-center gap-x-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Loading...
+                        </span>
+                      ) : (
+                        <p>Add Product</p>
+                      )}
+                    </Button>
                   </div>
                 </div>
                 <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
