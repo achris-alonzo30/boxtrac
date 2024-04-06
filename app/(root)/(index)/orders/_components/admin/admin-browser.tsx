@@ -1,3 +1,6 @@
+import Link from "next/link";
+
+import { PlusCircle } from "lucide-react";
 
 import {
     Card,
@@ -5,15 +8,16 @@ import {
     CardHeader,
     CardContent,
     CardDescription,
-} from "@/components/ui/card"
-import { Header } from "@/components/header"
-import { Sidebar } from "@/components/sidebar"
-import { TabLists } from "@/components/tab-list"
-import { Tabs, TabsContent, } from "@/components/ui/tabs"
-import { OrderReceipt } from "./admin-card/order-receipt"
-import { ActionButtons } from "@/components/action-buttons"
-import { PerformanceCard } from "./admin-card/performance-card"
-import { AdminOrdersTable } from "./admin-table/admin-orders-table"
+} from "@/components/ui/card";
+import { Header } from "@/components/header";
+import { Sidebar } from "@/components/sidebar";
+import { Button } from "@/components/ui/button";
+import { TabLists } from "@/components/tab-list";
+import { Tabs, TabsContent, } from "@/components/ui/tabs";
+import { OrderReceipt } from "./admin-card/order-receipt";
+import { FilterButton } from "@/components/filter-buttons";
+import { PerformanceCard } from "./admin-card/performance-card";
+import { AdminOrdersTable } from "./admin-table/admin-orders-table";
 
 export const AdminBrowser = () => {
     return (
@@ -23,11 +27,22 @@ export const AdminBrowser = () => {
                 <Header />
                 <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-3 xl:grid-cols-3">
                     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
+                        {/* Only for admin */}
                         <PerformanceCard />
                         <Tabs defaultValue="week">
                             <div className="flex items-center">
                                 <TabLists tabs={["week", "month", "year"]} />
-                                <ActionButtons btnName="New Order" filters={["Fulfilled", "Declined", "Pending"]} />
+                                <div className="ml-auto flex items-center gap-2">
+                                    <FilterButton filters={["week", "month", "year"]} />
+                                    <Button size="sm" className="h-8 gap-1">
+                                    <Link href="/orders/add" className="flex items-center gap-x-2">
+                                        <PlusCircle className="h-3.5 w-3.5" />
+                                        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
+                                        New Order
+                                        </span>
+                                    </Link>
+                                    </Button>
+                                </div>
                             </div>
                             <TabsContent value="week">
                                 <Card>
@@ -44,6 +59,7 @@ export const AdminBrowser = () => {
                             </TabsContent>
                         </Tabs>
                     </div>
+                    {/* Only for admin */}
                     <OrderReceipt />
                 </main>
             </div>

@@ -47,7 +47,6 @@ export const orderData = v.optional(
     itemName: v.string(),
     quantity: v.number(),
     supplier: v.string(),
-    inventoryId: v.optional(v.id("_storage")),
     requestForEdit: v.optional(v.boolean()),
     requestForDeletion: v.optional(v.boolean()),
   })
@@ -91,7 +90,6 @@ export default defineSchema({
     itemName: v.string(),
     quantity: v.number(),
     supplier: v.string(),
-    inventoryId: v.optional(v.id("_storage")),
     requestForEdit: v.optional(v.boolean()),
     requestForDeletion: v.optional(v.boolean()),
   })

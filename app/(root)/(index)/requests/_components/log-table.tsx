@@ -3,10 +3,10 @@
 
 import Image from "next/image";
 import { useAuth } from "@clerk/nextjs";
-import { inventoryData } from "./types";
 import { formatRelative } from "date-fns";
 import { api } from "@/convex/_generated/api";
 import { transformStockText } from "@/lib/utils";
+import { inventoryData, orderData } from "./types";
 import { useMutation, useQuery } from "convex/react";
 import { redirect, useRouter } from "next/navigation";
 
@@ -36,6 +36,7 @@ import { RequestTableHeads } from "./request-table-heads";
 import { Id } from "@/convex/_generated/dataModel";
 
 
+
 export const RequestsTable = () => {
     const { orgRole, orgId, isSignedIn } = useAuth();
 
@@ -43,6 +44,7 @@ export const RequestsTable = () => {
     const { toast } = useToast();
 
     const clear = useMutation(api.stagingArea.clear);
+    const addNewOrder = useMutation(api.orders.addNewOrder);
     const addInventory = useMutation(api.inventories.addItemToInventory);
     const updateInventory = useMutation(api.inventories.updateItemToInventory);
     const deleteInventory = useMutation(api.inventories.deleteItemToInventory);
@@ -50,35 +52,38 @@ export const RequestsTable = () => {
     
 
     const handleAddInventory = async (
-        values: inventoryData,
+        inventoryData: inventoryData,
+        orderData: orderData,
         itemId: Id<"stagingArea">,
         inventoryId: Id<"inventory">,
         action: string
     ) => {
-        if (!values || !orgId || !itemId || !inventoryId) return;
+        if (!inventoryData || !orderData || !orgId || !itemId || !inventoryId) return;
         try {
-            const res = await addInventory({
-                ...values,
-                orgId,
-            })
+            if (inventoryId && action === "[STAFF] Add New Item in Inventory") {
+                const res = await addInventory({
+                    ...inventoryData,
+                    orgId,
+                })
 
-            if (res?.status === "complete") {
-                clear({ itemId });
-                toast({
-                    description: "Item added successfully.",
-                    variant: "success",
-                    title: "Success",
-                })
-                router.push("/inventories")
-            } else {
-                toast({
-                    description: "Failed to add the item. Please try again.",
-                    variant: "destructive",
-                    title: "Error",
-                })
+                if (res) {
+                    clear({ itemId });
+                    toast({
+                        description: "Item added successfully.",
+                        variant: "success",
+                        title: "Success",
+                    })
+                    router.push("/inventories")
+                } else {
+                    toast({
+                        description: "Failed to add the item. Please try again.",
+                        variant: "destructive",
+                        title: "Error",
+                    })
+                }
             }
 
-            if (inventoryId && action.includes("Update")) {
+            if (inventoryId && action === "[STAFF] Delete Inventory" ) {
                 const res = await deleteInventory({
                     itemId: inventoryId,
                 })
@@ -99,10 +104,10 @@ export const RequestsTable = () => {
                 }
             }
 
-            if (inventoryId && action.includes("Delete")) {
+            if (inventoryId && action === "[STAFF] Update Item in Inventory") {
                 const res = await updateInventory({
                     id: inventoryId,
-                    ...values,
+                    ...inventoryData,
                 })
 
                 if (res.success === true ) {
@@ -120,6 +125,25 @@ export const RequestsTable = () => {
                     })
                 }
             }
+
+            if (inventoryId && action === "[STAFF] Create New Order") {
+                const res = await addNewOrder({
+                    ...orderData,
+                    inventoryId
+                })
+
+                if (res) {
+                    clear({ itemId });
+                    toast({
+                        title: "Success",
+                        description: "Order added successfully.",
+                        variant: "default",
+                    })
+                    router.push("/orders")
+                }
+            }
+
+            
         } catch (error) {
             console.error(JSON.stringify(error, null, 2));
             toast({
@@ -190,7 +214,7 @@ export const RequestsTable = () => {
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                                                 <DropdownMenuItem className="text-indigo-500">View</DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleAddInventory(item.data.inventoryData, item._id, item.inventoryId!, item.action!)} className="text-emerald-500">
+                                                <DropdownMenuItem onClick={() => handleAddInventory(item.data.inventoryData, item.data.orderData, item._id, item.inventoryId!, item.action!)} className="text-emerald-500">
                                                     Accept
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => handleClearInventory(item._id)} className="text-rose-500">Deny</DropdownMenuItem>

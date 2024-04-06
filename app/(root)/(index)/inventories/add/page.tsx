@@ -140,12 +140,6 @@ const AddInventoryPage = () => {
       })
     } finally {
       form.reset();
-      toast({
-        description: "Item added successfully.",
-        variant: "success",
-        title: "Success",
-      })
-      router.push("/inventories")
     }
   }
 
@@ -319,7 +313,6 @@ const AddInventoryPage = () => {
                               name="status"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Item Status</FormLabel>
                                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                       <SelectTrigger>

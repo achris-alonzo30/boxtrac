@@ -1,10 +1,10 @@
 import { ConvexError, v } from "convex/values";
-import { MutationCtx, QueryCtx, mutation, query } from "./_generated/server";
+import { MutationCtx, QueryCtx, internalMutation, mutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 
 // ################################################################
-// ######################## MUTATIONS #############################
+// ######################## Mutations #############################
 // ################################################################
 
 export const addItemToInventory = mutation({
@@ -102,6 +102,30 @@ export const deleteItemToInventory = mutation({
     } catch (error) {
       console.error(JSON.stringify(error, null, 2));
       return { success: false}
+    }
+
+  }
+});
+
+export const updateItemAfterOrder = internalMutation({
+  args: {
+    id: v.id("inventory"),
+    quantity: v.number(),
+  }, 
+  handler: async(ctx, { id, quantity }) => {
+    const item = await inventoryAccess(id, ctx);
+
+    if (!item) throw new ConvexError("[UPDATE_INVENTORY_AFTER_ORDER]: Inventory not found");
+
+    const updatedQuantity = item.item.quantity - quantity;
+    try {
+      await ctx.db.patch(id, {
+        quantity: updatedQuantity,
+      })
+
+      return { success: true}
+    } catch (error) {
+      console.error(JSON.stringify(error, null, 2));
     }
 
   }

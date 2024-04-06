@@ -18,6 +18,7 @@ import type * as clerk from "../clerk.js";
 import type * as http from "../http.js";
 import type * as inventories from "../inventories.js";
 import type * as logs from "../logs.js";
+import type * as orders from "../orders.js";
 import type * as stagingArea from "../stagingArea.js";
 import type * as users from "../users.js";
 
@@ -34,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   inventories: typeof inventories;
   logs: typeof logs;
+  orders: typeof orders;
   stagingArea: typeof stagingArea;
   users: typeof users;
 }>;
