@@ -4,7 +4,7 @@ import { useAuth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import { Loader } from "@/components/loader";
 
-import { AdminBrowser } from "./_components/admin/admin-browser";
+import { Browser } from "./_components/browser/browser";
 
 const OrdersPage = () => {
     const { isSignedIn, isLoaded, orgRole} = useAuth();
@@ -17,7 +17,7 @@ const OrdersPage = () => {
 
     return (
         <>
-            <AdminBrowser />
+            <Browser />
         </>
     )
 }

@@ -14,12 +14,12 @@ import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { TabLists } from "@/components/tab-list";
 import { Tabs, TabsContent, } from "@/components/ui/tabs";
-import { OrderReceipt } from "./admin-card/order-receipt";
+import { OrderReceipt } from "./admin-only/order-receipt";
 import { FilterButton } from "@/components/filter-buttons";
-import { PerformanceCard } from "./admin-card/performance-card";
-import { AdminOrdersTable } from "./admin-table/admin-orders-table";
+import { PerformanceCard } from "./admin-only/performance-card";
+import { OrdersTable } from "./table/orders-table";
 
-export const AdminBrowser = () => {
+export const Browser = () => {
     return (
         <div className="flex min-h-screen w-full flex-col bg-muted/40">
             <Sidebar />
@@ -53,7 +53,7 @@ export const AdminBrowser = () => {
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
-                                        <AdminOrdersTable />
+                                        <OrdersTable />
                                     </CardContent>
                                 </Card>
                             </TabsContent>

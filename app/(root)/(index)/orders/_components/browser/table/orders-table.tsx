@@ -7,8 +7,8 @@ import {
     TableHeader,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { AdminOrdersActions } from "./admin-orders-actions"
-import { AdminOrdersTableHeads } from "./admin-orders-table-heads"
+import { OrdersActions } from "./orders-actions"
+import { OrdersTableHeads } from "./orders-table-heads"
 
 const data = [
     {
@@ -54,11 +54,11 @@ const data = [
 ];
 
 
-export const AdminOrdersTable = () => {
+export const OrdersTable = () => {
     return (
         <Table>
             <TableHeader>
-                <AdminOrdersTableHeads />
+                <OrdersTableHeads />
             </TableHeader>
             <TableBody>
                 {data.map((item, index) => {
@@ -70,6 +70,7 @@ export const AdminOrdersTable = () => {
                                 : item.status === 'Cancelled'
                                     ? 'destructive'
                                     : 'default';
+                    // const profit = ;
                     return (
                         <TableRow key={index}>
                             <TableCell className="hidden sm:table-cell">{item.customerName}</TableCell>
@@ -80,7 +81,7 @@ export const AdminOrdersTable = () => {
                             <TableCell className="hidden md:table-cell">{item.price}</TableCell>
                             <TableCell className="font-medium">{item.transactionDate}</TableCell>
                             <TableCell>
-                                <AdminOrdersActions />
+                                <OrdersActions />
                             </TableCell>
                         </TableRow>
                     )

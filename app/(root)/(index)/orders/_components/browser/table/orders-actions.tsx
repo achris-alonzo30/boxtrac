@@ -9,7 +9,7 @@ import {
 
 
 import { Button } from "@/components/ui/button"  
-export const AdminOrdersActions = () => {
+export const OrdersActions = () => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
