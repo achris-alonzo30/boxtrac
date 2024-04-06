@@ -68,7 +68,7 @@ export const updateItemToInventory = mutation({
     if (!item) throw new ConvexError("[UPDATE_INVENTORY]: Inventory not found");
     
     try {
-      await ctx.db.patch(id, {
+      await ctx.db.patch(item.item._id, {
         size,
         price,
         status,

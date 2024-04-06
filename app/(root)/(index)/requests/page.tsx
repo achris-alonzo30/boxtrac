@@ -1,7 +1,7 @@
 "use client";
 
 import { redirect } from "next/navigation";
-import { useConvexAuth } from "convex/react";
+import { useAuth } from "@clerk/nextjs";
 
 import { Loader } from "@/components/loader";
 import { Header } from "@/components/header";
@@ -13,14 +13,15 @@ import { RequestsScreen } from "./_components/card-requests-container";
 
 
 
-const LogsPage = () => {
-  const { isAuthenticated, isLoading } = useConvexAuth();
+const RequestsPage = () => {
+  const { isSignedIn, isLoaded, orgRole} = useAuth();
 
-  if (isLoading) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
+  if (!isLoaded) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
 
-  if (!isAuthenticated) {
+  if (!isSignedIn || orgRole !== "org:admin") {
     redirect("/");
   }
+
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <Sidebar />
@@ -40,4 +41,4 @@ const LogsPage = () => {
   )
 }
 
-export default LogsPage;
+export default RequestsPage;

@@ -51,20 +51,20 @@ export const addNewOrder = mutation({
       quantity,
       supplier,
     });
-    console.log("Result", res)
+
     const item = await ctx.db.get(inventoryId);
-    console.log("Item", item)
+
     if (!item || !res) return null;
 
     const updatedQuantity = item.quantity - quantity;
-    console.log("Updated Quantity", updatedQuantity)
-    if (res) {
+
+    if (res && status === "Fulfilled") {
       await ctx.db.patch(item._id, {
         quantity: updatedQuantity,
       });
-
-      return { status: "complete" };
     }
+
+    return { status: "complete" };
   },
 });
 
@@ -77,25 +77,23 @@ export const updateOrder = mutation({
     customer: v.optional(v.string()),
     itemName: v.optional(v.string()),
     quantity: v.optional(v.number()),
-    supplier: v.optional(v.string()),
   },
   handler: async (
     ctx, 
-    { id, size, price, status, customer, itemName, quantity, supplier }
+    { id, size, price, status, customer, itemName, quantity }
   ) => {
     const order = await orderDataAccess(id, ctx);
-
+    
     if (!order) throw new ConvexError("[UPDATE_ORDER]: Order not found");
 
     try {
-      await ctx.db.patch(id, {
+      await ctx.db.patch(order.order._id, {
         size,
         price,
         status,
         customer,
         itemName,
         quantity,
-        supplier,
       });
 
       return { success: true}

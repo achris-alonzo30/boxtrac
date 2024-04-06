@@ -18,6 +18,5 @@ export type orderData = {
     itemName: string;
     customer: string;
     quantity: number;
-    orgId: string;
     supplier: string;
 } | undefined

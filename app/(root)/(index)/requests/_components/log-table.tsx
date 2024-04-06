@@ -129,7 +129,8 @@ export const RequestsTable = () => {
             if (inventoryId && action === "[STAFF] Create New Order") {
                 const res = await addNewOrder({
                     ...orderData,
-                    inventoryId
+                    inventoryId,
+                    orgId
                 })
 
                 if (res) {

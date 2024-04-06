@@ -320,9 +320,9 @@ const AddInventoryPage = () => {
                                       </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                      <SelectItem value="inStock">In Stock</SelectItem>
-                                      <SelectItem value="lowStock">Low Stock</SelectItem>
-                                      <SelectItem value="outOfStock">Out of Stock</SelectItem>
+                                      <SelectItem value="In Stock">In Stock</SelectItem>
+                                      <SelectItem value="Low Stock">Low Stock</SelectItem>
+                                      <SelectItem value="Out Of Stock">Out of Stock</SelectItem>
                                     </SelectContent>
                                   </Select>
                                   <FormMessage />

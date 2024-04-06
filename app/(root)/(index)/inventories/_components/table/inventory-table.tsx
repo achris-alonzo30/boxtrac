@@ -5,7 +5,6 @@ import { useAuth } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { formatRelative } from "date-fns";
 import { api } from "@/convex/_generated/api";
-import { transformStockText } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 
 
@@ -48,18 +47,18 @@ export const InventoryTable = () => {
                     <TableBody>
                         {inventories.map((item) => {
                             const variant =
-                                item.status === 'inStock'
+                                item.status === 'In Stock'
                                     ? 'default'
-                                    : item.status === 'lowStock'
+                                    : item.status === 'Low Stock'
                                         ? 'secondary'
-                                        : item.status === 'outOfStock'
+                                        : item.status === 'Out Of Stock'
                                             ? 'destructive'
                                             : 'default';
                             return (
                                 <TableRow key={item._id}>
                                     <TableCell className="font-medium">{item.itemName}</TableCell>
                                     <TableCell className="font-medium">{item.size}</TableCell>
-                                    <TableCell><Badge variant={variant}>{transformStockText(item.status)}</Badge></TableCell>
+                                    <TableCell><Badge variant={variant}>{item.status}</Badge></TableCell>
                                     <TableCell className="hidden md:table-cell">{item.quantity}</TableCell>
                                     <TableCell className="hidden md:table-cell">₱{item.price}</TableCell>
                                     <TableCell className="font-medium">{item.supplier}</TableCell>

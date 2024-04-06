@@ -354,6 +354,7 @@ const AddOrderPage = () => {
                                     <SelectContent>
                                       <SelectItem value="Fulfilled">Fulfilled</SelectItem>
                                       <SelectItem value="Pending">Pending</SelectItem>
+                                      <SelectItem value="Refunded">Refunded</SelectItem>
                                       <SelectItem value="Cancelled">Cancelled</SelectItem>
                                     </SelectContent>
                                   </Select>
