@@ -1,6 +1,6 @@
 import { TableHead, TableRow } from "@/components/ui/table"
 
-export const OrdersTableHeads = () => {
+export const OrdersTableHeads = ({ isAdmin }: { isAdmin: boolean; }) => {
     return (
         <TableRow>
             <TableHead className="hidden md:table-cell">
@@ -12,11 +12,12 @@ export const OrdersTableHeads = () => {
             <TableHead>Status</TableHead>
             <TableHead className="hidden md:table-cell">Quantity</TableHead>
             <TableHead className="hidden md:table-cell">Price</TableHead>
-            
             {/* Only for admin */}
-            <TableHead className="hidden md:table-cell">
-                Profit
-            </TableHead>
+            {isAdmin && (
+                <TableHead className="hidden md:table-cell">
+                    Profit
+                </TableHead>
+            )}
             <TableHead>
                 <span className="sr-only">Actions</span>
             </TableHead>

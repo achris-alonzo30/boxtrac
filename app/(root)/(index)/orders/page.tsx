@@ -7,7 +7,7 @@ import { Loader } from "@/components/loader";
 import { Browser } from "./_components/browser/browser";
 
 const OrdersPage = () => {
-    const { isSignedIn, isLoaded, orgRole} = useAuth();
+    const { isSignedIn, isLoaded } = useAuth();
 
     if (!isLoaded) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
 

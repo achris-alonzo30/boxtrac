@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
 
 import { PlusCircle } from "lucide-react";
 
@@ -13,13 +16,18 @@ import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { TabLists } from "@/components/tab-list";
+import { OrdersTable } from "./table/orders-table";
 import { Tabs, TabsContent, } from "@/components/ui/tabs";
 import { OrderReceipt } from "./admin-only/order-receipt";
 import { FilterButton } from "@/components/filter-buttons";
 import { PerformanceCard } from "./admin-only/performance-card";
-import { OrdersTable } from "./table/orders-table";
 
 export const Browser = () => {
+    const { orgRole, orgId } = useAuth();
+
+    const isAdmin = orgRole === "org:admin";
+    const isStaff = orgRole === "org:member";
+
     return (
         <div className="flex min-h-screen w-full flex-col bg-muted/40">
             <Sidebar />
@@ -28,12 +36,12 @@ export const Browser = () => {
                 <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-3 xl:grid-cols-3">
                     <div className="grid auto-rows-max items-start gap-4 md:gap-8 lg:col-span-2">
                         {/* Only for admin */}
-                        <PerformanceCard />
+                        {isAdmin && <PerformanceCard />}
                         <Tabs defaultValue="week">
                             <div className="flex items-center">
                                 <TabLists tabs={["week", "month", "year"]} />
                                 <div className="ml-auto flex items-center gap-2">
-                                    <FilterButton filters={["week", "month", "year"]} />
+                                    <FilterButton filters={["Fulfilled", "Pending", "Cancelled"]} />
                                     <Button size="sm" className="h-8 gap-1">
                                     <Link href="/orders/add" className="flex items-center gap-x-2">
                                         <PlusCircle className="h-3.5 w-3.5" />
@@ -53,14 +61,14 @@ export const Browser = () => {
                                         </CardDescription>
                                     </CardHeader>
                                     <CardContent>
-                                        <OrdersTable />
+                                        <OrdersTable orgId={orgId ? orgId : "skip"} isAdmin={isAdmin} isStaff={isStaff} />
                                     </CardContent>
                                 </Card>
                             </TabsContent>
                         </Tabs>
                     </div>
                     {/* Only for admin */}
-                    <OrderReceipt />
+                    {isAdmin && <OrderReceipt />}
                 </main>
             </div>
         </div>

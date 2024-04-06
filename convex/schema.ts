@@ -41,7 +41,6 @@ export const orderData = v.optional(
   v.object({
     size: v.string(),
     price: v.number(),
-    orgId: v.string(),
     status: v.string(),
     customer: v.string(),
     itemName: v.string(),
@@ -112,6 +111,7 @@ export default defineSchema({
       inventoryData: inventoryData,
     }),
     inventoryId: v.optional(v.id("inventory")),
+    orderId: v.optional(v.id("order")),
   }).index("byOrgId", ["orgId"]),
 
 });

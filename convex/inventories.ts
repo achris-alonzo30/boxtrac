@@ -81,8 +81,6 @@ export const updateItemToInventory = mutation({
       console.error(JSON.stringify(error, null, 2));
       return { success: false}
     }
-    
-
   },
 });
 
@@ -96,7 +94,7 @@ export const deleteItemToInventory = mutation({
     if (!item) throw new ConvexError("[DELETE_INVENTORY]: Inventory not found");
 
     try {
-      await ctx.db.delete(itemId);
+      await ctx.db.delete(item.item._id);
 
       return { success: true};
     } catch (error) {
@@ -107,29 +105,6 @@ export const deleteItemToInventory = mutation({
   }
 });
 
-export const updateItemAfterOrder = internalMutation({
-  args: {
-    id: v.id("inventory"),
-    quantity: v.number(),
-  }, 
-  handler: async(ctx, { id, quantity }) => {
-    const item = await inventoryAccess(id, ctx);
-
-    if (!item) throw new ConvexError("[UPDATE_INVENTORY_AFTER_ORDER]: Inventory not found");
-
-    const updatedQuantity = item.item.quantity - quantity;
-    try {
-      await ctx.db.patch(id, {
-        quantity: updatedQuantity,
-      })
-
-      return { success: true}
-    } catch (error) {
-      console.error(JSON.stringify(error, null, 2));
-    }
-
-  }
-})
 
 // ################################################################
 // ######################### Queries ##############################
@@ -158,7 +133,7 @@ export const itemToEdit = query({
 
     if (!item) throw new ConvexError("[ITEM_TO_EDIT]: Inventory not found");
 
-    return await ctx.db.get(itemId);
+    return await ctx.db.get(item.item._id);
   },
 });
 

@@ -3,13 +3,18 @@
 import { z } from "zod";
 import { useAuth } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
 import { redirect, useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 
-import { Loader2, ChevronLeft } from "lucide-react"
+import {
+  Loader2,
+  ChevronLeft,
+} from "lucide-react";
 
 import {
   Form,
@@ -41,8 +46,8 @@ import {
   SelectContent,
   SelectTrigger,
 } from "@/components/ui/select";
-import { Loader } from "@/components/loader";
 import { Header } from "@/components/header";
+import { Loader } from "@/components/loader";
 import { Input } from "@/components/ui/input";
 import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
@@ -57,7 +62,7 @@ const formSchema = z.object({
   quantity: z.string().min(1),
 })
 
-const AddOrderPage = () => {
+export default function EditOrderPage({ params }: { params: { orderId: Id<"order"> } }) {
   const { orgRole, orgId, isSignedIn } = useAuth();
 
   const router = useRouter();
@@ -65,10 +70,22 @@ const AddOrderPage = () => {
 
   const role = orgRole ?? "skip";
 
-  const addNewOrder = useMutation(api.orders.addNewOrder);
+  const updateOrder = useMutation(api.orders.updateOrder);
   const addToStagingArea = useMutation(api.stagingArea.addToStagingArea);
-  const items = useQuery(api.inventories.getInventories, orgId ? { orgId } : "skip");
+  const order = useQuery(api.orders.orderToEdit, { orderId: params.orderId });
 
+  useEffect(() => {
+    // Update the form default values when 'item' changes
+    form.reset({
+      size: order?.size || '',
+      price: order?.price ? String(order.price) : '',
+      status: order?.status || '',
+      quantity: order?.quantity ? String(order.quantity) : '',
+      itemName: order?.itemName || '',
+      customer: order?.customer || '',
+    });
+  }, [order]);
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -80,49 +97,53 @@ const AddOrderPage = () => {
       customer: "",
     }
   })
+
   const isSubmitting = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const itemToUpdate = items?.find((item) => item.itemName === values.itemName && item.size === values.size);
-    if (!orgId || !itemToUpdate) return;
+    if (!orgId || !order) return;
     try {
-
       if (role === "org:admin") {
-        const res = await addNewOrder({
-          orgId,
+        const res = await updateOrder({
+          id: params.orderId,
           size: values.size,
+          price: parseFloat(values.price),
           status: values.status,
           itemName: values.itemName,
-          customer: values.customer,
-          inventoryId: itemToUpdate?._id,
-          price: parseFloat(values.price),
-          supplier: itemToUpdate?.supplier,
           quantity: parseInt(values.quantity),
+          customer: values.customer,
         })
 
-        if (res) {
+        if (res.success === true) {
           toast({
-            title: "Success",
-            description: "Order added successfully.",
+            description: "Order updated successfully.",
             variant: "success",
+            title: "Success",
           })
           router.push("/orders")
+        } else {
+          toast({
+            description: "Failed to update order. Please try again.",
+            variant: "destructive",
+            title: "Error",
+          })
         }
+
       } else if (role === "org:member") {
         const res = await addToStagingArea({
           orgId,
-          inventoryId: itemToUpdate?._id,
-          action: "[STAFF] Create New Order",
+          orderId: params.orderId,
+          action: "[STAFF] Update Order",
           data: {
-            dataType: "Order",
+            dataType: "Inventory",
             orderData: {
               size: values.size,
+              price: parseFloat(values.price),
               status: values.status,
               itemName: values.itemName,
-              customer: values.customer,
-              price: parseFloat(values.price),
-              supplier: itemToUpdate?.supplier,
               quantity: parseInt(values.quantity),
+              customer: values.customer,
+              supplier: order.supplier
             }
           }
         });
@@ -135,14 +156,12 @@ const AddOrderPage = () => {
           })
           router.push("/orders")
         }
-      } else {
-        return null;
       }
 
     } catch (error) {
       console.error(JSON.stringify(error, null, 2));
       toast({
-        description: "Failed to add item. Please try again.",
+        description: "Failed to update order. Please try again.",
         variant: "destructive",
         title: "Error",
       })
@@ -151,12 +170,7 @@ const AddOrderPage = () => {
     }
   }
 
-  if (!isSignedIn) redirect("/");
-
-  const isLoading = items === undefined;
-
-  const itemNames = Array.from(new Set(items?.map((item) => item.itemName)));
-  const itemSizes = Array.from(new Set(items?.map((item) => item.size)));
+  if (!isSignedIn) redirect("/")
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -173,7 +187,7 @@ const AddOrderPage = () => {
                     <span className="sr-only">Back</span>
                   </Button>
                   <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
-                    Add New Order
+                    Update Order
                   </h1>
                   <div className="hidden items-center gap-2 md:ml-auto md:flex">
                     <Button
@@ -194,19 +208,18 @@ const AddOrderPage = () => {
                           Loading...
                         </span>
                       ) : (
-                        <p>Create Order</p>
+                        <p>Update Order</p>
                       )}
                     </Button>
                   </div>
                 </div>
-                {isLoading && <Loader text="Loading Order" />}
                 <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
                   <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
                     <Card>
                       <CardHeader>
                         <CardTitle>Order Details</CardTitle>
                         <CardDescription>
-                          Complete the form below to add a new order.
+                          Fill in the order details.
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
@@ -217,19 +230,10 @@ const AddOrderPage = () => {
                               name="itemName"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Choose Product</FormLabel>
-                                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl>
-                                      <SelectTrigger>
-                                        <SelectValue placeholder="Item Name" />
-                                      </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                      {itemNames?.map((item, index) => (
-                                        <SelectItem key={index} value={item}>{item}</SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
+                                  <FormLabel>Order Name</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="Enter name..."  {...field} required />
+                                  </FormControl>
                                   <FormMessage />
                                 </FormItem>
                               )}
@@ -243,7 +247,7 @@ const AddOrderPage = () => {
                                 <FormItem>
                                   <FormLabel>Customer Name</FormLabel>
                                   <FormControl>
-                                    <Input placeholder="Enter customer"  {...field} required />
+                                    <Input placeholder="Enter customer..."  {...field} required />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -277,6 +281,7 @@ const AddOrderPage = () => {
                                   name="quantity"
                                   render={({ field }) => (
                                     <FormItem>
+                                      <FormLabel>Quantity</FormLabel>
                                       <FormControl>
                                         <Input id="quantity" min="0" placeholder="99" type="number" {...field} />
                                       </FormControl>
@@ -291,6 +296,7 @@ const AddOrderPage = () => {
                                   name="price"
                                   render={({ field }) => (
                                     <FormItem>
+                                      <FormLabel>Item Size</FormLabel>
                                       <FormControl>
                                         <div className="flex items-center gap-x-2">
                                           ₱
@@ -309,18 +315,10 @@ const AddOrderPage = () => {
                                   name="size"
                                   render={({ field }) => (
                                     <FormItem>
-                                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                        <FormControl>
-                                          <SelectTrigger>
-                                            <SelectValue placeholder="Size" />
-                                          </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                          {itemSizes?.map((item, index) => (
-                                            <SelectItem key={index} value={item}>{item}</SelectItem>
-                                          ))}
-                                        </SelectContent>
-                                      </Select>
+                                      <FormLabel>Item Size</FormLabel>
+                                      <FormControl>
+                                        <Input placeholder="Enter size..."  {...field} required />
+                                      </FormControl>
                                       <FormMessage />
                                     </FormItem>
                                   )}
@@ -352,7 +350,7 @@ const AddOrderPage = () => {
                                       </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                      <SelectItem value="Fulfilled">Fulfilled</SelectItem>
+                                    <SelectItem value="Fulfilled">Fulfilled</SelectItem>
                                       <SelectItem value="Pending">Pending</SelectItem>
                                       <SelectItem value="Cancelled">Cancelled</SelectItem>
                                     </SelectContent>
@@ -365,9 +363,51 @@ const AddOrderPage = () => {
                         </div>
                       </CardContent>
                     </Card>
+                    {/* <Card className="overflow-hidden">
+                      <CardHeader>
+                        <CardTitle>Product Images</CardTitle>
+                        <CardDescription>
+                          Lipsum dolor sit amet, consectetur adipiscing elit
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid gap-2">
+                          <Image
+                            alt="Product image"
+                            className="aspect-square w-full rounded-md object-cover"
+                            height="300"
+                            src="/placeholder.svg"
+                            width="300"
+                          />
+                          <div className="grid grid-cols-3 gap-2">
+                            <button>
+                              <Image
+                                alt="Product image"
+                                className="aspect-square w-full rounded-md object-cover"
+                                height="84"
+                                src="/placeholder.svg"
+                                width="84"
+                              />
+                            </button>
+                            <button>
+                              <Image
+                                alt="Product image"
+                                className="aspect-square w-full rounded-md object-cover"
+                                height="84"
+                                src="/placeholder.svg"
+                                width="84"
+                              />
+                            </button>
+                            <button className="flex aspect-square w-full items-center justify-center rounded-md border border-dashed">
+                              <Upload className="h-4 w-4 text-muted-foreground" />
+                              <span className="sr-only">Upload</span>
+                            </button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card> */}
                   </div>
                 </div>
-
                 <div className="flex justify-end items-center gap-2 md:hidden">
                   <Button
                     variant="outline"
@@ -387,7 +427,7 @@ const AddOrderPage = () => {
                         Loading...
                       </span>
                     ) : (
-                      <p>Create Order</p>
+                      <p>Update Order</p>
                     )}
                   </Button>
                 </div>
@@ -399,5 +439,3 @@ const AddOrderPage = () => {
     </div >
   )
 }
-
-export default AddOrderPage;

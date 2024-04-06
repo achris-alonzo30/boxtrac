@@ -6,7 +6,7 @@ import { useQuery } from "convex/react";
 import { formatRelative } from "date-fns";
 import { api } from "@/convex/_generated/api";
 import { transformStockText } from "@/lib/utils";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 
 import { PlusCircle } from "lucide-react"
