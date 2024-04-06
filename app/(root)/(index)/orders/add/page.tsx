@@ -1,6 +1,7 @@
 "use client";
 
 import { z } from "zod";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
 import { api } from "@/convex/_generated/api";
@@ -9,7 +10,7 @@ import { redirect, useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 
-import { Loader2, ChevronLeft } from "lucide-react"
+import { Loader2, ChevronLeft, TriangleAlert, OctagonAlert, CircleCheck } from "lucide-react"
 
 import {
   Form,
@@ -38,6 +39,8 @@ import {
   Select,
   SelectItem,
   SelectValue,
+  SelectLabel,
+  SelectGroup,
   SelectContent,
   SelectTrigger,
 } from "@/components/ui/select";
@@ -80,6 +83,8 @@ const AddOrderPage = () => {
       customer: "",
     }
   })
+
+  const chosenItem = form.getValues("itemName")
   const isSubmitting = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -155,8 +160,8 @@ const AddOrderPage = () => {
 
   const isLoading = items === undefined;
 
-  const itemNames = Array.from(new Set(items?.map((item) => item.itemName)));
-  const itemSizes = Array.from(new Set(items?.map((item) => item.size)));
+  const itemNames = Array.from(new Set(items?.map((item) => ({itemName: item.itemName, status: item.status}))));
+  const itemSizes = Array.from(new Set(items?.filter(item => item.itemName === chosenItem).map(item => item.size)));
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -226,7 +231,15 @@ const AddOrderPage = () => {
                                     </FormControl>
                                     <SelectContent>
                                       {itemNames?.map((item, index) => (
-                                        <SelectItem key={index} value={item}>{item}</SelectItem>
+                                        <SelectItem key={index} value={item.itemName}>
+                                          <div className="flex items-center">
+                                            <p className={cn(item.status === "Out Of Stock" && "line-through text-muted-foreground")}>{item.itemName}</p>
+                                            {item.status === "Low Stock" && <TriangleAlert className="h-3.5 w-3.5 text-amber-400 ml-4" />}
+                                            {item.status === "Out Of Stock" && <OctagonAlert className="h-3.5 w-3.5 text-rose-400 ml-4" />}
+                                            {item.status === "In Stock" && <CircleCheck className="h-3.5 w-3.5 text-emerald-400 ml-4" />}
+                                          </div>
+                                          
+                                        </SelectItem>
                                       ))}
                                     </SelectContent>
                                   </Select>
@@ -316,9 +329,12 @@ const AddOrderPage = () => {
                                           </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
-                                          {itemSizes?.map((item, index) => (
-                                            <SelectItem key={index} value={item}>{item}</SelectItem>
-                                          ))}
+                                          <SelectGroup>
+                                            <SelectLabel>Available Sizes</SelectLabel>
+                                            {itemSizes?.map((item, index) => (
+                                              <SelectItem key={index} value={item}>{item}</SelectItem>
+                                            ))}
+                                          </SelectGroup>
                                         </SelectContent>
                                       </Select>
                                       <FormMessage />
