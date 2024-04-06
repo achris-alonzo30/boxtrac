@@ -13,10 +13,9 @@ const OrdersPage = () => {
 
     if (!isLoaded) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
 
-    if (isSignedIn) {
+    if (!isSignedIn) {
         redirect("/dashboard");
     }
-
 
     return (
         <>

@@ -6,8 +6,8 @@ import {
     CardContent,
     CardDescription,
 } from "@/components/ui/card"
-import { Header } from "@/app/(root)/(index)/_components/header"
-import { Sidebar } from "@/app/(root)/(index)/_components/sidebar"
+import { Header } from "@/components/header"
+import { Sidebar } from "@/components/sidebar"
 import { TabLists } from "@/components/tab-list"
 import { Tabs, TabsContent, } from "@/components/ui/tabs"
 import { OrderReceipt } from "./admin-card/order-receipt"

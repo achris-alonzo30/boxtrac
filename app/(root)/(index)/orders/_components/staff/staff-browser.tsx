@@ -10,8 +10,8 @@ import {
   Tabs,
   TabsContent,
 } from "@/components/ui/tabs"
-import { Header } from "@/app/(root)/(index)/_components/header"
-import { Sidebar } from "@/app/(root)/(index)/_components/sidebar"
+import { Header } from "@/components/header"
+import { Sidebar } from "@/components/sidebar"
 import { TabLists } from "@/components/tab-list"
 import { ActionButtons } from "@/components/action-buttons"
 import { StaffOrdersTable } from "./staff-table/staff-orders-table"

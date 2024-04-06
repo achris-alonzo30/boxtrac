@@ -1,9 +1,9 @@
 "use client";
 
 import { z } from "zod";
-import { useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
+import { useEffect } from "react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
@@ -73,6 +73,7 @@ export default function EditInventoryPage({ params }: { params: { itemId: Id<"in
   const addToStagingArea = useMutation(api.stagingArea.addToStagingArea);
   const updateInventory = useMutation(api.inventories.updateItemToInventory);
   const item = useQuery(api.inventories.itemToEdit, { itemId: params.itemId });
+
   useEffect(() => {
     // Update the form default values when 'item' changes
     form.reset({
@@ -83,8 +84,8 @@ export default function EditInventoryPage({ params }: { params: { itemId: Id<"in
       itemName: item?.itemName || '',
       supplier: item?.supplier || '',
     });
-  }, [item]);
-
+  }, [item ]);
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -97,8 +98,8 @@ export default function EditInventoryPage({ params }: { params: { itemId: Id<"in
     }
   })
 
-  const isLoading = item === undefined;
   const isSubmitting = form.formState.isSubmitting;
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!orgId) return;
     try {
@@ -175,6 +176,7 @@ export default function EditInventoryPage({ params }: { params: { itemId: Id<"in
       <Sidebar />
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
         <Header />
+        {/* {isLoading && <Loader text="Loading Product" />} */}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
@@ -221,7 +223,6 @@ export default function EditInventoryPage({ params }: { params: { itemId: Id<"in
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
-                        {isLoading && <Loader text="Loading Product" />}
                         <div className="grid gap-6">
                           <div className="grid gap-3">
                             <FormField

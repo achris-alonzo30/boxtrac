@@ -35,15 +35,6 @@ export const Sidebar = () => {
                         <span className="sr-only">Dashboard</span>
                     </Link>
                 </ActionTooltip>
-                <ActionTooltip name="Orders">
-                    <Link
-                        href="/orders"
-                        className={cn("flex h-9 w-9 items-center justify-center rounded-lg text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8", pathname === "/orders" && "bg-accent text-accent-foreground")}
-                    >
-                        <ShoppingCart className="h-5 w-5" />
-                        <span className="sr-only">Orders</span>
-                    </Link>
-                </ActionTooltip>
                 <ActionTooltip name="Inventories">
                     <Link
                         href="/inventories"
@@ -53,6 +44,16 @@ export const Sidebar = () => {
                         <span className="sr-only">Inventories</span>
                     </Link>
                 </ActionTooltip>
+                <ActionTooltip name="Orders">
+                    <Link
+                        href="/orders"
+                        className={cn("flex h-9 w-9 items-center justify-center rounded-lg text-accent-foreground transition-colors hover:text-foreground md:h-8 md:w-8", pathname === "/orders" && "bg-accent text-accent-foreground")}
+                    >
+                        <ShoppingCart className="h-5 w-5" />
+                        <span className="sr-only">Orders</span>
+                    </Link>
+                </ActionTooltip>
+                
                 {admin && (
                     <ActionTooltip name="Requests">
                         <Link
