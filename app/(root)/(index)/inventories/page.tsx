@@ -1,36 +1,32 @@
 "use client";
 
-
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useConvexAuth } from "convex/react";
-import { PlusCircle } from "lucide-react";
 
 import {
   Card,
-  CardTitle,
   CardFooter,
-  CardHeader,
   CardContent,
-  CardDescription,
 } from "@/components/ui/card";
 import { Loader } from "@/components/loader";
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
-import { Button } from "@/components/ui/button";
 import { TabLists } from "@/components/tab-list";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { FilterButton } from "@/components/filter-buttons";
 import { InventoryTable } from "./_components/table/inventory-table";
+import { CardHeaders } from "@/components/card-headers";
+import { AddButton } from "@/components/action-buttons";
 
 const InventoryPage = () => {
   const { isAuthenticated, isLoading } = useConvexAuth();
 
-  if (isLoading) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
+  if (isLoading) <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
 
   if (!isAuthenticated) {
     redirect("/");
   }
+  
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
       <Sidebar />
@@ -42,24 +38,12 @@ const InventoryPage = () => {
               <TabLists tabs={["inStock", "lowStock", "outOfStock"]} />
               <div className="ml-auto flex items-center gap-2">
                 <FilterButton filters={["inStock", "lowStock", "outOfStock"]} />
-                <Button size="sm" className="h-8 gap-1" asChild>
-                  <Link href="/inventories/add" className="flex items-center gap-x-2">
-                    <PlusCircle className="h-3.5 w-3.5" />
-                    <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                      Add Inventory
-                    </span>
-                  </Link>
-                </Button>
+                <AddButton route="/inventories/add" btnName="Add Inventory" />
               </div>
             </div>
             <TabsContent value="all">
               <Card>
-                <CardHeader>
-                  <CardTitle>Inventory</CardTitle>
-                  <CardDescription>
-                    Manage and keep track of your inventory.
-                  </CardDescription>
-                </CardHeader>
+                <CardHeaders title="Inventory" description="Manage and keep track of your inventory."/>
                 <CardContent>
                   <InventoryTable />
                 </CardContent>

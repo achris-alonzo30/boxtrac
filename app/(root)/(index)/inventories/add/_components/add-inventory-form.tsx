@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { api } from "@/convex/_generated/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Loader2, ChevronLeft } from "lucide-react"
+import { ChevronLeft } from "lucide-react"
 
 import {
     Form,
@@ -40,7 +40,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { CardHeaders } from "@/components/card-headers";
-import { InventoryActionButtons } from "./inventory-action-buttons";
+import { InventoryAddActionButtons } from "./inventory-add-action-buttons";
 
 const formSchema = z.object({
     size: z.string().min(1),
@@ -161,7 +161,7 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
                             <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
                                 Add New Item to Inventory
                             </h1>
-                            <InventoryActionButtons form={form} isLoading={isLoading} largeScreen />
+                            <InventoryAddActionButtons form={form} isLoading={isLoading} largeScreen />
                         </div>
                         <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
                             <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
@@ -300,7 +300,7 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
                                 </Card>
                             </div>
                         </div>
-                        <InventoryActionButtons form={form} isLoading={isLoading} smallScreen />
+                        <InventoryAddActionButtons form={form} isLoading={isLoading} smallScreen />
                     </div>
                 </main>
             </form>

@@ -20,7 +20,7 @@ type InventoryActionsProps = {
     largeScreen?: boolean;
 }
 
-export const InventoryActionButtons = ({ isLoading, form, smallScreen, largeScreen }: InventoryActionsProps) => {
+export const InventoryEditActionButtons = ({ isLoading, form, smallScreen, largeScreen }: InventoryActionsProps) => {
     const router = useRouter();
     return (
         <>

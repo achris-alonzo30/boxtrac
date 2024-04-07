@@ -1,6 +1,5 @@
 "use client";
 
-import { z } from "zod";
 import { useAuth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/header";
@@ -10,10 +9,12 @@ import { AddInventoryForm } from "./_components/add-inventory-form";
 const AddInventoryPage = () => {
   const { orgRole, orgId, isSignedIn } = useAuth();
 
+  if (!isSignedIn) {
+    redirect("/");
+  }
+
   const isAdmin = orgRole === "org:admin";
   const isStaff = orgRole === "org:member"
-
-  if (!isSignedIn) redirect("/")
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40">
