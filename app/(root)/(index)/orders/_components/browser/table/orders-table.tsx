@@ -48,9 +48,11 @@ export const OrdersTable = ({ orgId, isAdmin, isStaff }: OrdersTableProps) => {
                                     ? 'default'
                                     : item.status === 'Pending'
                                         ? 'secondary'
-                                        : item.status === 'Cancelled'
-                                            ? 'destructive'
-                                            : 'default';
+                                        : item.status === 'Refunded'
+                                            ? 'neutral'
+                                            : item.status === 'Cancelled'
+                                                ? 'destructive'
+                                                : 'default';
                             const profit = item.price * item.quantity;
                             return (
                                 <TableRow key={index}>

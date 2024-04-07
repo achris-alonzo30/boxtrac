@@ -105,7 +105,39 @@ export const deleteItemToInventory = mutation({
   }
 });
 
+export const updateItemQuantity = internalMutation({
+  args: {
+    inventoryId: v.id("inventory"),
+    status: v.string(),
+    stateQuantity: v.number(),
+    prevStatus: v.string(),
+  },
+  handler: async (ctx, { inventoryId, status, stateQuantity, prevStatus } ) => {
+    const item = await ctx.db.get(inventoryId);
 
+    if (!item) return null;
+    try {
+      if (prevStatus && prevStatus === "Fulfilled" && status === "Refunded") {
+        const quantity = item.quantity + stateQuantity;
+        await ctx.db.patch(item?._id, {
+          quantity
+        })
+      }
+
+      if (prevStatus && prevStatus === "Pending" && status === "Fulfilled") {
+        const quantity = item.quantity - stateQuantity;
+        await ctx.db.patch(item._id, {
+          quantity
+        })
+      }
+
+      return { success: true}
+    } catch (error) {
+      console.error(JSON.stringify(error, null, 2));
+      return { success: false}
+    }
+  }
+})
 // ################################################################
 // ######################### Queries ##############################
 // ################################################################

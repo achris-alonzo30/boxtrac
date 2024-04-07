@@ -1,9 +1,9 @@
 "use client";
 
 import { z } from "zod";
+import { useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
@@ -43,11 +43,12 @@ import {
   Select,
   SelectItem,
   SelectValue,
+  SelectLabel,
+  SelectGroup,
   SelectContent,
   SelectTrigger,
 } from "@/components/ui/select";
 import { Header } from "@/components/header";
-import { Loader } from "@/components/loader";
 import { Input } from "@/components/ui/input";
 import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
@@ -73,6 +74,7 @@ export default function EditOrderPage({ params }: { params: { orderId: Id<"order
   const updateOrder = useMutation(api.orders.updateOrder);
   const addToStagingArea = useMutation(api.stagingArea.addToStagingArea);
   const order = useQuery(api.orders.orderToEdit, { orderId: params.orderId });
+  const items = useQuery(api.inventories.getInventories, orgId ? { orgId } : "skip");
 
   useEffect(() => {
     // Update the form default values when 'item' changes
@@ -101,7 +103,9 @@ export default function EditOrderPage({ params }: { params: { orderId: Id<"order
   const isSubmitting = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (!orgId || !order) return;
+    const itemToUpdate = items?.find((item) => item.itemName === values.itemName && item.size === values.size && item.orgId === orgId);
+    if (!orgId || !order || !items || !itemToUpdate) return;
+    
     try {
       if (role === "org:admin") {
         const res = await updateOrder({
@@ -112,6 +116,7 @@ export default function EditOrderPage({ params }: { params: { orderId: Id<"order
           itemName: values.itemName,
           quantity: parseInt(values.quantity),
           customer: values.customer,
+          inventoryId: itemToUpdate._id
         })
 
         if (res.success === true) {
@@ -182,7 +187,7 @@ export default function EditOrderPage({ params }: { params: { orderId: Id<"order
             <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
               <div className="mx-auto grid max-w-[60rem] flex-1 auto-rows-max gap-4">
                 <div className="flex items-center gap-4">
-                  <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => router.back()}>
+                  <Button type="button" variant="outline" size="icon" className="h-7 w-7" onClick={() => router.back()}>
                     <ChevronLeft className="h-4 w-4" />
                     <span className="sr-only">Back</span>
                   </Button>
@@ -191,6 +196,7 @@ export default function EditOrderPage({ params }: { params: { orderId: Id<"order
                   </h1>
                   <div className="hidden items-center gap-2 md:ml-auto md:flex">
                     <Button
+                      type="button" 
                       variant="outline"
                       size="sm"
                       onClick={() => {
@@ -346,13 +352,16 @@ export default function EditOrderPage({ params }: { params: { orderId: Id<"order
                                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                                     <FormControl>
                                       <SelectTrigger>
-                                        <SelectValue placeholder="Select Status" />
+                                        <SelectValue placeholder={order?.status} />
                                       </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                    <SelectItem value="Fulfilled">Fulfilled</SelectItem>
-                                      <SelectItem value="Pending">Pending</SelectItem>
-                                      <SelectItem value="Cancelled">Cancelled</SelectItem>
+                                      <SelectGroup>
+                                        {order?.status !== "Fulfilled" && <SelectItem value="Fulfilled">Fulfilled</SelectItem>}
+                                        <SelectItem value="Pending">Pending</SelectItem>
+                                        <SelectItem value="Refunded">Refunded</SelectItem>
+                                        <SelectItem value="Cancelled">Cancelled</SelectItem>
+                                      </SelectGroup>
                                     </SelectContent>
                                   </Select>
                                   <FormMessage />
@@ -410,6 +419,7 @@ export default function EditOrderPage({ params }: { params: { orderId: Id<"order
                 </div>
                 <div className="flex justify-end items-center gap-2 md:hidden">
                   <Button
+                    type="button" 
                     variant="outline"
                     size="sm"
                     onClick={() => {

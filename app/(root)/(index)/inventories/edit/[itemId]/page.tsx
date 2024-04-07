@@ -182,7 +182,7 @@ export default function EditInventoryPage({ params }: { params: { itemId: Id<"in
             <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
               <div className="mx-auto grid max-w-[60rem] flex-1 auto-rows-max gap-4">
                 <div className="flex items-center gap-4">
-                  <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => router.back()}>
+                  <Button type="button"  variant="outline" size="icon" className="h-7 w-7" onClick={() => router.back()}>
                     <ChevronLeft className="h-4 w-4" />
                     <span className="sr-only">Back</span>
                   </Button>
@@ -191,6 +191,7 @@ export default function EditInventoryPage({ params }: { params: { itemId: Id<"in
                   </h1>
                   <div className="hidden items-center gap-2 md:ml-auto md:flex">
                     <Button
+                      type="button" 
                       variant="outline"
                       size="sm"
                       onClick={() => {
@@ -410,6 +411,7 @@ export default function EditInventoryPage({ params }: { params: { itemId: Id<"in
                 </div>
                 <div className="flex justify-end items-center gap-2 md:hidden">
                   <Button
+                    type="button" 
                     variant="outline"
                     size="sm"
                     onClick={() => {

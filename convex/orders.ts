@@ -1,6 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import { MutationCtx, QueryCtx, mutation, query } from "./_generated/server";
-import { orgAccess } from "./inventories";
+import { inventoryAccess, orgAccess } from "./inventories";
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
 
@@ -64,7 +64,9 @@ export const addNewOrder = mutation({
       });
     }
 
-    return { status: "complete" };
+    if (res) {
+      return { status: "complete" };
+    }
   },
 });
 
@@ -77,10 +79,11 @@ export const updateOrder = mutation({
     customer: v.optional(v.string()),
     itemName: v.optional(v.string()),
     quantity: v.optional(v.number()),
+    inventoryId: v.optional(v.id("inventory")),
   },
   handler: async (
     ctx, 
-    { id, size, price, status, customer, itemName, quantity }
+    { id, size, price, status, customer, itemName, quantity, inventoryId }
   ) => {
     const order = await orderDataAccess(id, ctx);
     
@@ -96,11 +99,24 @@ export const updateOrder = mutation({
         quantity,
       });
 
+      const prevStatus = order.order.status;
+
+      if (inventoryId) {
+        await ctx.scheduler.runAfter(0, internal.inventories.updateItemQuantity, {
+        status: status ? status : "skip",
+        inventoryId,
+        stateQuantity: quantity ? quantity : 0,
+        prevStatus,
+      })
+      }
+    
       return { success: true}
     } catch (error) {
       console.error(JSON.stringify(error, null, 2));
       return { success: false}
     }
+
+    
   }
 })
 
