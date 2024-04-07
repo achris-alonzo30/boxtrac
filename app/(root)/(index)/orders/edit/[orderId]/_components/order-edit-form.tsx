@@ -1,68 +1,96 @@
 "use client";
 
 import { z } from "zod";
+import { useEffect } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
-import { useMutation } from "convex/react";
-import { useRouter } from "next/navigation";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { useMutation, useQuery } from "convex/react";
+import { redirect, useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { ChevronLeft } from "lucide-react"
 
 import {
-    Form,
-    FormItem,
-    FormField,
-    FormLabel,
-    FormControl,
-    FormMessage,
+  Loader2,
+  ChevronLeft,
+} from "lucide-react";
+
+import {
+  Form,
+  FormItem,
+  FormField,
+  FormLabel,
+  FormControl,
+  FormMessage,
 } from "@/components/ui/form";
 import {
-    Card,
-    CardContent,
+  Card,
+  CardTitle,
+  CardHeader,
+  CardContent,
+  CardDescription,
 } from "@/components/ui/card";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import {
-    Select,
-    SelectItem,
-    SelectValue,
-    SelectContent,
-    SelectTrigger,
+  Select,
+  SelectItem,
+  SelectValue,
+  SelectLabel,
+  SelectGroup,
+  SelectContent,
+  SelectTrigger,
 } from "@/components/ui/select";
+import { Header } from "@/components/header";
 import { Input } from "@/components/ui/input";
+import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { OrderEditActionButtons } from "./order-edit-action-button";
 import { CardHeaders } from "@/components/card-headers";
-import { InventoryAddActionButtons } from "./inventory-add-action-buttons";
 
 const formSchema = z.object({
-    size: z.string().min(1),
-    price: z.string().min(1),
-    status: z.string().min(1),
-    itemName: z.string().min(1),
-    supplier: z.string().min(1),
-    quantity: z.string().min(1),
+  size: z.string().min(1),
+  price: z.string().min(1),
+  status: z.string().min(1),
+  itemName: z.string().min(1),
+  customer: z.string().min(1),
+  quantity: z.string().min(1),
 })
 
-type AddInventoryFormProps = {
-    orgId: string | null;
-    isAdmin: boolean;
-    isStaff: boolean;
+type OrderEditFormProps = {
+  orderId: Id<"order">,
+  orgId: string | null,
+  isAdmin: boolean,
+  isStaff: boolean,
 }
 
-export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps) => {
+export const OrderEditForm = ({ orderId, orgId, isAdmin, isStaff }: OrderEditFormProps) => {
     const router = useRouter();
     const { toast } = useToast();
 
-    const addInventory = useMutation(api.inventories.addItemToInventory);
+    const updateOrder = useMutation(api.orders.updateOrder);
     const addToStagingArea = useMutation(api.stagingArea.addToStagingArea);
+    const order = useQuery(api.orders.orderToEdit, { orderId });
+
+    useEffect(() => {
+        // Update the form default values when 'item' changes
+        form.reset({
+            size: order?.size || '',
+            price: order?.price ? String(order.price) : '',
+            status: order?.status || '',
+            quantity: order?.quantity ? String(order.quantity) : '',
+            itemName: order?.itemName || '',
+            customer: order?.customer || '',
+        });
+    }, [order]);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -72,50 +100,62 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
             status: "",
             quantity: "",
             itemName: "",
-            supplier: "",
+            customer: "",
         }
     })
 
     const isLoading = form.formState.isSubmitting;
+    const items = useQuery(api.inventories.getInventories, orgId ? { orgId } : "skip");
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        if (!orgId) return;
+        const itemToUpdate = items?.find((item) => item.itemName === values.itemName && item.size === values.size && item.orgId === orgId);
+        if (!orgId || !order || !items || !itemToUpdate) return;
         let success = false;
         try {
             success = false;
             if (isAdmin) {
-                const res = await addInventory({
-                    orgId,
+                const res = await updateOrder({
+                    id: orderId,
                     size: values.size,
+                    price: parseFloat(values.price),
                     status: values.status,
                     itemName: values.itemName,
-                    supplier: values.supplier,
-                    price: parseFloat(values.price),
                     quantity: parseInt(values.quantity),
+                    customer: values.customer,
+                    inventoryId: itemToUpdate._id
                 })
 
-                if (res) {
+                if (res.success === true) {
                     toast({
-                        title: "Success",
-                        description: "Item added to inventory",
+                        description: "Order updated successfully.",
                         variant: "success",
+                        title: "Success",
                     })
                     success = true;
+                } else {
+                    toast({
+                        description: "Failed to update order. Please try again.",
+                        variant: "destructive",
+                        title: "Error",
+                    })
                 }
-            } else if (isStaff) {
 
+            } else if (isStaff) {
                 const res = await addToStagingArea({
                     orgId,
-                    action: "[STAFF] Add New Item in Inventory",
+                    orderId: orderId,
+                    inventoryId: itemToUpdate._id,
+                    action: "[STAFF] Update Order",
                     data: {
-                        dataType: "Inventory",
-                        inventoryData: {
+                        dataType: "Order",
+                        orderData: {
                             size: values.size,
+                            price: parseFloat(values.price),
                             status: values.status,
                             itemName: values.itemName,
-                            supplier: values.supplier,
-                            price: parseFloat(values.price),
                             quantity: parseInt(values.quantity),
+                            customer: values.customer,
+                            supplier: order.supplier
                         }
                     }
                 });
@@ -128,25 +168,22 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
                     })
                     success = true;
                 }
-            } else {
-                return null;
             }
 
         } catch (error) {
             console.error(JSON.stringify(error, null, 2));
             toast({
-                description: "Failed to add item. Please try again.",
+                description: "Failed to update order. Please try again.",
                 variant: "destructive",
                 title: "Error",
             })
         } finally {
-            form.reset();
             if (success) {
-                router.push("/inventories")
+                router.push("/orders");
             }
+            form.reset();
         }
     }
-
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -158,14 +195,14 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
                                 <span className="sr-only">Back</span>
                             </Button>
                             <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
-                                Add New Item to Inventory
+                                Update Order
                             </h1>
-                            <InventoryAddActionButtons form={form} isLoading={isLoading} largeScreen />
+                            <OrderEditActionButtons isLoading={isLoading} form={form} largeScreen  />
                         </div>
                         <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
                             <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">
                                 <Card>
-                                    <CardHeaders title="Product Details" description="Fill in the product details." />
+                                    <CardHeaders title="Order Details" description="Fill in the order details." />
                                     <CardContent>
                                         <div className="grid gap-6">
                                             <div className="grid gap-3">
@@ -174,7 +211,7 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
                                                     name="itemName"
                                                     render={({ field }) => (
                                                         <FormItem>
-                                                            <FormLabel>Item Name</FormLabel>
+                                                            <FormLabel>Order Name</FormLabel>
                                                             <FormControl>
                                                                 <Input placeholder="Enter name..."  {...field} required />
                                                             </FormControl>
@@ -186,12 +223,12 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
                                             <div className="grid gap-3">
                                                 <FormField
                                                     control={form.control}
-                                                    name="supplier"
+                                                    name="customer"
                                                     render={({ field }) => (
                                                         <FormItem>
-                                                            <FormLabel>Supplier Name</FormLabel>
+                                                            <FormLabel>Customer Name</FormLabel>
                                                             <FormControl>
-                                                                <Input placeholder="Enter supplier"  {...field} required />
+                                                                <Input placeholder="Enter customer..."  {...field} required />
                                                             </FormControl>
                                                             <FormMessage />
                                                         </FormItem>
@@ -202,7 +239,7 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
                                     </CardContent>
                                 </Card>
                                 <Card>
-                                    <CardHeaders title="Stock" description="Keep track of your inventory." />
+                                    <CardHeaders title="Order Details" description="Fill in the order details." />
                                     <CardContent>
                                         <Table>
                                             <TableHeader>
@@ -220,6 +257,7 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
                                                             name="quantity"
                                                             render={({ field }) => (
                                                                 <FormItem>
+                                                                    <FormLabel>Quantity</FormLabel>
                                                                     <FormControl>
                                                                         <Input id="quantity" min="0" placeholder="99" type="number" {...field} />
                                                                     </FormControl>
@@ -234,6 +272,7 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
                                                             name="price"
                                                             render={({ field }) => (
                                                                 <FormItem>
+                                                                    <FormLabel>Item Size</FormLabel>
                                                                     <FormControl>
                                                                         <div className="flex items-center gap-x-2">
                                                                             ₱
@@ -252,6 +291,7 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
                                                             name="size"
                                                             render={({ field }) => (
                                                                 <FormItem>
+                                                                    <FormLabel>Item Size</FormLabel>
                                                                     <FormControl>
                                                                         <Input placeholder="Enter size..."  {...field} required />
                                                                     </FormControl>
@@ -268,7 +308,7 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
                             </div>
                             <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
                                 <Card>
-                                    <CardHeaders title="Product Status" />
+                                    <CardHeaders title="Order Status" />
                                     <CardContent>
                                         <div className="grid gap-6">
                                             <div className="grid gap-3">
@@ -280,13 +320,16 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
                                                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                                 <FormControl>
                                                                     <SelectTrigger>
-                                                                        <SelectValue placeholder="Select State" />
+                                                                        <SelectValue placeholder={order?.status} />
                                                                     </SelectTrigger>
                                                                 </FormControl>
                                                                 <SelectContent>
-                                                                    <SelectItem value="In Stock">In Stock</SelectItem>
-                                                                    <SelectItem value="Low Stock">Low Stock</SelectItem>
-                                                                    <SelectItem value="Out Of Stock">Out of Stock</SelectItem>
+                                                                    <SelectGroup>
+                                                                        {order?.status !== "Fulfilled" && <SelectItem value="Fulfilled">Fulfilled</SelectItem>}
+                                                                        <SelectItem value="Pending">Pending</SelectItem>
+                                                                        <SelectItem value="Refunded">Refunded</SelectItem>
+                                                                        <SelectItem value="Cancelled">Cancelled</SelectItem>
+                                                                    </SelectGroup>
                                                                 </SelectContent>
                                                             </Select>
                                                             <FormMessage />
@@ -299,7 +342,7 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
                                 </Card>
                             </div>
                         </div>
-                        <InventoryAddActionButtons form={form} isLoading={isLoading} smallScreen />
+                        <OrderEditActionButtons form={form} isLoading={isLoading} smallScreen />
                     </div>
                 </main>
             </form>

@@ -13,14 +13,14 @@ type InventoryActionsProps = {
         price: string;
         status: string;
         itemName: string;
-        supplier: string;
         quantity: string;
+        customer: string;
     }, any, undefined>;
     smallScreen?: boolean;
     largeScreen?: boolean;
 }
 
-export const InventoryEditActionButtons = ({ isLoading, form, smallScreen, largeScreen }: InventoryActionsProps) => {
+export const OrderAddActionButtons = ({ isLoading, form, smallScreen, largeScreen }: InventoryActionsProps) => {
     const router = useRouter();
     return (
         <>
@@ -38,14 +38,14 @@ export const InventoryEditActionButtons = ({ isLoading, form, smallScreen, large
                     >
                         Cancel
                     </Button>
-                    <Button size="sm" disabled={isLoading}>
+                    <Button size="sm" disabled={isLoading} type="submit">
                         {isLoading ? (
                             <span className="flex items-center gap-x-2">
                                 <Loader2 className="h-4 w-4 animate-spin" />
                                 Loading...
                             </span>
                         ) : (
-                            <p>Update Product</p>
+                            <p>Create Order</p>
                         )}
                     </Button>
                 </div>
@@ -71,7 +71,7 @@ export const InventoryEditActionButtons = ({ isLoading, form, smallScreen, large
                                 Loading...
                             </span>
                         ) : (
-                            <p>Update Product</p>
+                            <p>Create Order</p>
                         )}
                     </Button>
                 </div>

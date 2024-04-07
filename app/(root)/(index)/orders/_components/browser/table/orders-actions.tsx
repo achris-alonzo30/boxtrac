@@ -47,7 +47,9 @@ export const OrdersActions = ({ itemId, isAdmin, isStaff, orgId }: InventoryActi
     
     const handleSubmit = async (orderId: Id<"order">) => {
         if (!orgId || !orderId) return;
+        let success = false;
         try {
+            success = false;
             if (isAdmin) {
                 const res = await deleteOrder({
                     id: orderId
@@ -59,8 +61,7 @@ export const OrdersActions = ({ itemId, isAdmin, isStaff, orgId }: InventoryActi
                         description: "Item has been deleted",
                         variant: "default",
                     })
-                    router.push("/orders")
-                    setIsConfirmOpen(false);
+                    success = true;
                 }
                 
             } else if (isStaff) {
@@ -79,8 +80,7 @@ export const OrdersActions = ({ itemId, isAdmin, isStaff, orgId }: InventoryActi
                         description: "Your request has been sent and is pending for approval",
                         variant: "default",
                     })
-                    router.push("/orders")
-                    setIsConfirmOpen(false);
+                    success = true;
                 }
 
             } else {
@@ -95,6 +95,9 @@ export const OrdersActions = ({ itemId, isAdmin, isStaff, orgId }: InventoryActi
                 variant: "destructive",
             })
         } finally {
+            if (success) {
+                router.push("/orders")
+            }
             setIsConfirmOpen(false);
         }
     }

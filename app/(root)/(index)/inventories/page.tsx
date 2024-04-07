@@ -16,7 +16,7 @@ import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { FilterButton } from "@/components/filter-buttons";
 import { InventoryTable } from "./_components/table/inventory-table";
 import { CardHeaders } from "@/components/card-headers";
-import { AddButton } from "@/components/action-buttons";
+import { AddButton } from "@/components/add-buttons";
 
 const InventoryPage = () => {
   const { isAuthenticated, isLoading } = useConvexAuth();

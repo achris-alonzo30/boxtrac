@@ -16,7 +16,6 @@ export default function EditInventoryPage({ params }: { params: { itemId: Id<"in
 
   if (!isSignedIn) {
     redirect("/");
-    return null;
 
   }
   

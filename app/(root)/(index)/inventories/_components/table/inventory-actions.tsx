@@ -76,7 +76,6 @@ export const InventoryActions = ({ itemId, isAdmin, isStaff, orgId }: InventoryA
                 })
 
                 if (res) {
-                    
                     toast({
                         title: "Request Sent",
                         description: "Your request has been sent and is pending for approval",

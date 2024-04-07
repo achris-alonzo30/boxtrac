@@ -6,8 +6,6 @@ import { formatRelative } from "date-fns";
 import { useRouter } from "next/navigation";
 import { api } from "@/convex/_generated/api";
 
-import { PlusCircle } from "lucide-react";
-
 import {
     Table,
     TableRow,
@@ -17,9 +15,10 @@ import {
 } from "@/components/ui/table";
 import { Loader } from "@/components/loader";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { OrdersActions } from "./orders-actions";
+import { AddButton } from "@/components/add-buttons";
 import { OrdersTableHeads } from "./orders-table-heads";
+
 
 type OrdersTableProps = {
     isAdmin: boolean;
@@ -76,18 +75,12 @@ export const OrdersTable = ({ orgId, isAdmin, isStaff }: OrdersTableProps) => {
                 </Table>
             ) : (
                 <section className="w-full flex flex-col items-center justify-center space-y-4 my-12">
-
+                    {isLoading && <Loader text="Loading Orders" />}
                     <Image src="/no-data.svg" alt="No Data" width={100} height={100} />
                     <p className="text-xl  font-medium">No Order</p>
-                    <Button size="sm" className="h-8 gap-1" onClick={() => router.push("/orders/add")}>
-                        <PlusCircle className="h-3.5 w-3.5" />
-                        <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                            New Order
-                        </span>
-                    </Button>
+                    <AddButton route="/orders/add" btnName="New Order" />
                 </section>
             )}
-            {isLoading && <Loader text="Loading Orders" />}
         </>
     )
 }

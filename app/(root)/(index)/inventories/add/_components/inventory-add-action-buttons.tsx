@@ -45,7 +45,7 @@ export const InventoryAddActionButtons = ({ isLoading, form, smallScreen, largeS
                                 Loading...
                             </span>
                         ) : (
-                            <p>Update Product</p>
+                            <p>Add Product</p>
                         )}
                     </Button>
                 </div>

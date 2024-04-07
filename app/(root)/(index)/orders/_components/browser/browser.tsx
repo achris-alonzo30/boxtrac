@@ -17,6 +17,8 @@ import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { TabLists } from "@/components/tab-list";
 import { OrdersTable } from "./table/orders-table";
+import { AddButton } from "@/components/add-buttons";
+import { CardHeaders } from "@/components/card-headers";
 import { Tabs, TabsContent, } from "@/components/ui/tabs";
 import { OrderReceipt } from "./admin-only/order-receipt";
 import { FilterButton } from "@/components/filter-buttons";
@@ -44,24 +46,12 @@ export const Browser = ({ orgId, isAdmin, isStaff }: BrowserProps) => {
                                     <TabLists tabs={["week", "month", "year"]} />
                                     <div className="ml-auto flex items-center gap-2">
                                         <FilterButton filters={["Fulfilled", "Pending", "Cancelled"]} />
-                                        <Button size="sm" className="h-8 gap-1">
-                                            <Link href="/orders/add" className="flex items-center gap-x-2">
-                                                <PlusCircle className="h-3.5 w-3.5" />
-                                                <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                                                    New Order
-                                                </span>
-                                            </Link>
-                                        </Button>
+                                        <AddButton route="/orders/add" btnName="New Order" />
                                     </div>
                                 </div>
                                 <TabsContent value="week">
                                     <Card>
-                                        <CardHeader className="px-7">
-                                            <CardTitle>Orders</CardTitle>
-                                            <CardDescription>
-                                                Recent orders from your store.
-                                            </CardDescription>
-                                        </CardHeader>
+                                        <CardHeaders title="Orders" description="View and manage your orders." />
                                         <CardContent>
                                             <OrdersTable orgId={orgId ? orgId : "skip"} isAdmin={isAdmin} isStaff={isStaff} />
                                         </CardContent>
@@ -79,26 +69,14 @@ export const Browser = ({ orgId, isAdmin, isStaff }: BrowserProps) => {
                                 <TabLists tabs={["inStock", "lowStock", "outOfStock"]} />
                                 <div className="ml-auto flex items-center gap-2">
                                     <FilterButton filters={["inStock", "lowStock", "outOfStock"]} />
-                                    <Button size="sm" className="h-8 gap-1" asChild>
-                                        <Link href="/orders/add" className="flex items-center gap-x-2">
-                                            <PlusCircle className="h-3.5 w-3.5" />
-                                            <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                                                New Order
-                                            </span>
-                                        </Link>
-                                    </Button>
+                                    <AddButton route="/orders/add" btnName="New Order" />
                                 </div>
                             </div>
                             <TabsContent value="all">
                                 <Card>
-                                    <CardHeader>
-                                        <CardTitle>Orders</CardTitle>
-                                        <CardDescription>
-                                            Recent orders from your store.
-                                        </CardDescription>
-                                    </CardHeader>
+                                    <CardHeaders title="Orders" description="View and manage your orders." />
                                     <CardContent>
-                                    <OrdersTable orgId={orgId ? orgId : "skip"} isAdmin={isAdmin} isStaff={isStaff} />
+                                        <OrdersTable orgId={orgId ? orgId : "skip"} isAdmin={isAdmin} isStaff={isStaff} />
                                     </CardContent>
                                     <CardFooter>
                                         <div className="text-xs text-muted-foreground">
