@@ -70,16 +70,17 @@ export const SignInScreen = () => {
         variant: "destructive",
       })
     } finally {
-      loginForm.reset();
+      
       if (success) {
         toast({
-        title: "Login Successfully",
-        description: "You've successfully login. We're redirecting you now to main page.",
-        variant: "success",
-      })
-      router.push("/dashboard");
+          title: "Login Successfully",
+          description: "You've successfully login. We're redirecting you now to main page.",
+          variant: "success",
+        })
+        router.push("/dashboard");
       }
-      
+      loginForm.reset();
+
     }
   };
 
@@ -132,7 +133,7 @@ export const SignInScreen = () => {
               </div>
             </form>
           </Form>
-          
+
         </CardContent>
       </Card>
     </div>

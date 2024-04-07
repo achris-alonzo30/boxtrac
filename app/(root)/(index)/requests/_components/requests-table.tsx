@@ -64,15 +64,11 @@ export const RequestsTable = () => {
         inventoryId: Id<"inventory">,
         orderId: Id<"order">,
         action: string
-    ) => {
-
+    ) => {  
         if (!orgId) return;
+        let success = false;
         try {
-            console.log("[Log Table] - inventoryData", inventoryData)
-            console.log("[Log Table] - orderData", orderData)
-            console.log("[Log Table] - itemId", itemId)
-            console.log("[Log Table] - inventoryId", inventoryId)
-            console.log("[Log Table] - action", action)
+            success = false;
             if (action === "[STAFF] Add New Item in Inventory" && inventoryData) {
                 const res = await addInventory({
                     ...inventoryData,
@@ -80,13 +76,14 @@ export const RequestsTable = () => {
                 })
 
                 if (res) {
-                    clear({ itemId });
                     toast({
                         description: "Item added successfully.",
                         variant: "success",
                         title: "Success",
                     })
-                    router.push("/inventories")
+                    success = true;
+                    clear({ itemId });
+                    
                 } else {
                     toast({
                         description: "Failed to add the item. Please try again.",
@@ -102,13 +99,13 @@ export const RequestsTable = () => {
                 })
 
                 if (res.success === true) {
-                    clear({ itemId });
                     toast({
                         description: "Item deleted successfully.",
                         variant: "success",
                         title: "Success",
                     })
-
+                    success = true;
+                    clear({ itemId });
                 } else {
                     toast({
                         description: "Failed to delete the item. Please try again.",
@@ -125,12 +122,13 @@ export const RequestsTable = () => {
                 })
 
                 if (res.success === true) {
-                    clear({ itemId });
                     toast({
                         description: "Item updated successfully.",
                         variant: "success",
                         title: "Success",
                     })
+                    success = true;
+                    clear({ itemId });
                 } else {
                     toast({
                         description: "Failed to update the item. Please try again.",
@@ -148,13 +146,13 @@ export const RequestsTable = () => {
                 })
 
                 if (res) {
-                    clear({ itemId });
                     toast({
                         title: "Success",
                         description: "Order added successfully.",
                         variant: "success",
                     })
-                    router.push("/orders")
+                    success = true;
+                    clear({ itemId });
                 }
             }
             console.log('[REQUEST_TABLE] - action:', action);
@@ -169,26 +167,26 @@ export const RequestsTable = () => {
                 })
 
                 if (res?.success === true) {
-                    clear({ itemId });
                     toast({
                         description: "Order updated successfully.",
                         variant: "success",
                         title: "Success",
                     })
+                    success = true;
+                    clear({ itemId });
                 }
-                router.push("/orders")
             } 
 
             if (orderId && action === "[STAFF] Delete Order") {
                 const res = await deleteOrder({ id: orderId })
                 if (res?.success === true) {
-                    clear({ itemId });
                     toast({
                         description: "Order deleted successfully.",
                         variant: "default",
                         title: "Success",
                     })
-                    router.push("/orders")
+                    success = true;
+                    clear({ itemId });
                 }
             }
 
@@ -199,11 +197,17 @@ export const RequestsTable = () => {
                 variant: "destructive",
                 title: "Error",
             })
+        } finally {
+            if (success) {
+                router.push("/inventories")
+            }
         }
     }
     const handleClearInventory = async (itemId: Id<"stagingArea">) => {
         if (!itemId) return;
+        let success = false;
         try {
+            success = false;
             const res = await clear({ itemId })
 
             if (res) {
@@ -212,7 +216,8 @@ export const RequestsTable = () => {
                     variant: "success",
                     title: "Success",
                 })
-                router.push("/inventories")
+                success = true;
+                clear({ itemId });
             } else {
                 toast({
                     description: "Failed to clear the item. Please try again.",
@@ -227,6 +232,10 @@ export const RequestsTable = () => {
                 variant: "destructive",
                 title: "Error",
             })
+        } finally {
+            if (success) {
+                router.push("/requests")
+            }
         }
     }
 

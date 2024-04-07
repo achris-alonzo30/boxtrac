@@ -1,20 +1,12 @@
 "use client";
 
-import Link from "next/link";
-
-import { PlusCircle } from "lucide-react";
-
 import {
     Card,
-    CardTitle,
-    CardHeader,
     CardFooter,
     CardContent,
-    CardDescription,
 } from "@/components/ui/card";
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
-import { Button } from "@/components/ui/button";
 import { TabLists } from "@/components/tab-list";
 import { OrdersTable } from "./table/orders-table";
 import { AddButton } from "@/components/add-buttons";
@@ -33,7 +25,7 @@ type BrowserProps = {
 export const Browser = ({ orgId, isAdmin, isStaff }: BrowserProps) => {
 
     return (
-        <div className="flex min-h-screen w-full flex-col bg-muted/40">
+        <div className="flex h-full w-full flex-col bg-muted/40">
             <Sidebar />
             <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
                 <Header />

@@ -122,6 +122,7 @@ export const OrderEditForm = ({ orderId, orgId, isAdmin, isStaff }: OrderEditFor
                     itemName: values.itemName,
                     quantity: parseInt(values.quantity),
                     customer: values.customer,
+                    supplier: order.supplier,
                     inventoryId: itemToUpdate._id
                 })
 

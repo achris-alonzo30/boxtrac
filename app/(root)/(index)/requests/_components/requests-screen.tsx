@@ -1,22 +1,15 @@
 import {
     Card,
-    CardTitle,
     CardFooter,
-    CardHeader,
     CardContent,
-    CardDescription,
   } from "@/components/ui/card";
 import { RequestsTable } from "./requests-table";
+import { CardHeaders } from "@/components/card-headers";
 
 export const RequestsScreen = () => {
     return (
         <Card>
-            <CardHeader>
-                <CardTitle>Requests</CardTitle>
-                <CardDescription>
-                    Here are all the requests from your staffs.
-                </CardDescription>
-            </CardHeader>
+            <CardHeaders title="Requests" description="Here are all the requests from your staffs." />
             <CardContent>
                 <RequestsTable />
             </CardContent>
