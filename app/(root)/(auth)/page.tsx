@@ -20,6 +20,7 @@ const AuthPage = () => {
     if (isAuthenticated) {
         redirect("/dashboard");
     }
+    
     return (
         <div className="max-w-lg flex flex-col h-screen items-center justify-center mx-auto my-12">
             <Tabs defaultValue="sign-in" className="max-w-lg">

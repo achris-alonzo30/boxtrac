@@ -47,7 +47,6 @@ import {
   SelectTrigger,
 } from "@/components/ui/select";
 import { Header } from "@/components/header";
-import { Loader } from "@/components/loader";
 import { Input } from "@/components/ui/input";
 import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
@@ -67,8 +66,6 @@ export default function EditInventoryPage({ params }: { params: { itemId: Id<"in
 
   const router = useRouter();
   const { toast } = useToast();
-
-  const role = orgRole ?? "skip";
 
   const addToStagingArea = useMutation(api.stagingArea.addToStagingArea);
   const updateInventory = useMutation(api.inventories.updateItemToInventory);
@@ -97,7 +94,7 @@ export default function EditInventoryPage({ params }: { params: { itemId: Id<"in
       supplier: "",
     }
   })
-
+  const role = orgRole ?? "skip";
   const isSubmitting = form.formState.isSubmitting;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -120,7 +117,6 @@ export default function EditInventoryPage({ params }: { params: { itemId: Id<"in
             variant: "success",
             title: "Success",
           })
-          router.push("/inventories")
         } else {
           toast({
             description: "Failed to update item. Please try again.",
@@ -153,7 +149,6 @@ export default function EditInventoryPage({ params }: { params: { itemId: Id<"in
             description: "Your request has been sent and is pending for approval",
             variant: "default",
           })
-          router.push("/inventories")
         }
       }
 
@@ -166,6 +161,7 @@ export default function EditInventoryPage({ params }: { params: { itemId: Id<"in
       })
     } finally {
       form.reset();
+      router.push("/inventories")
     }
   }
 
@@ -351,9 +347,9 @@ export default function EditInventoryPage({ params }: { params: { itemId: Id<"in
                                       </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                      <SelectItem value="inStock">In Stock</SelectItem>
-                                      <SelectItem value="lowStock">Low Stock</SelectItem>
-                                      <SelectItem value="outOfStock">Out of Stock</SelectItem>
+                                      <SelectItem value="In Stock">In Stock</SelectItem>
+                                      <SelectItem value="Low Stock">Low Stock</SelectItem>
+                                      <SelectItem value="Out Of Stock">Out of Stock</SelectItem>
                                     </SelectContent>
                                   </Select>
                                   <FormMessage />

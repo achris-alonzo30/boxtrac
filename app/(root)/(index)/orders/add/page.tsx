@@ -66,11 +66,8 @@ const AddOrderPage = () => {
   const router = useRouter();
   const { toast } = useToast();
 
-  const role = orgRole ?? "skip";
-
   const addNewOrder = useMutation(api.orders.addNewOrder);
   const addToStagingArea = useMutation(api.stagingArea.addToStagingArea);
-  const items = useQuery(api.inventories.getInventories, orgId ? { orgId } : "skip");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -84,8 +81,10 @@ const AddOrderPage = () => {
     }
   })
 
+  const role = orgRole ?? "skip";
   const chosenItem = form.getValues("itemName")
   const isSubmitting = form.formState.isSubmitting;
+  const items = useQuery(api.inventories.getInventories, orgId ? { orgId } : "skip");
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const itemToUpdate = items?.find((item) => item.itemName === values.itemName && item.size === values.size && item.orgId === orgId);

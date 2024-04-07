@@ -27,12 +27,11 @@ import { InventoryTableHeads } from "./inventory-table-heads";
 
 export const InventoryTable = () => {
     const { orgId, orgRole } = useAuth();
+    const router = useRouter();
 
     const isAdmin = orgRole === "org:admin";
     const isStaff = orgRole === "org:member";
 
-    const router = useRouter();
- 
     const inventories = useQuery(api.inventories.getInventories, orgId ? { orgId } : "skip");
 
     const isLoading = inventories === undefined;

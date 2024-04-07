@@ -79,11 +79,12 @@ export const updateOrder = mutation({
     customer: v.optional(v.string()),
     itemName: v.optional(v.string()),
     quantity: v.optional(v.number()),
+    supplier: v.optional(v.string()),
     inventoryId: v.optional(v.id("inventory")),
   },
   handler: async (
     ctx, 
-    { id, size, price, status, customer, itemName, quantity, inventoryId }
+    { id, size, price, status, customer, itemName, quantity, supplier, inventoryId }
   ) => {
     const order = await orderDataAccess(id, ctx);
     
@@ -97,16 +98,19 @@ export const updateOrder = mutation({
         customer,
         itemName,
         quantity,
+        supplier,
       });
 
       const prevStatus = order.order.status;
+      const refunded = prevStatus === "Fulfilled" && (status === "Refunded" || status === "Pending" || status === "Cancelled");
+      const fulfilled = (prevStatus === "Pending" || prevStatus === "Refunded" || prevStatus === "Cancelled") && status === "Fulfilled";
 
-      if (inventoryId) {
+      if (inventoryId && (refunded || fulfilled)) {
         await ctx.scheduler.runAfter(0, internal.inventories.updateItemQuantity, {
-        status: status ? status : "skip",
+        refunded,
+        fulfilled,
         inventoryId,
         stateQuantity: quantity ? quantity : 0,
-        prevStatus,
       })
       }
     

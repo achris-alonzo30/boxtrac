@@ -38,29 +38,42 @@ import { Id } from "@/convex/_generated/dataModel";
 
 
 export const RequestsTable = () => {
-    const { orgRole, orgId, isSignedIn } = useAuth();
+    const { orgId, isSignedIn } = useAuth();
 
     const router = useRouter();
     const { toast } = useToast();
 
-    const clear = useMutation(api.stagingArea.clear);
-    const addNewOrder = useMutation(api.orders.addNewOrder);
+    // Inventory Actions
     const addInventory = useMutation(api.inventories.addItemToInventory);
     const updateInventory = useMutation(api.inventories.updateItemToInventory);
     const deleteInventory = useMutation(api.inventories.deleteItemToInventory);
-    const items = useQuery(api.stagingArea.getItemsInStagingArea, orgId ? { orgId } : "skip");
     
+    // Order Actions
+    const addNewOrder = useMutation(api.orders.addNewOrder);
+    const updateOrder = useMutation(api.orders.updateOrder);
+    const deleteOrder = useMutation(api.orders.deleteOrder);
+    
+    // Staging Area Actions
+    const clear = useMutation(api.stagingArea.clear);
+    const items = useQuery(api.stagingArea.getItemsInStagingArea, orgId ? { orgId } : "skip");
 
-    const handleAddInventory = async (
+    const handleAcceptRequests = async (
         inventoryData: inventoryData,
         orderData: orderData,
         itemId: Id<"stagingArea">,
         inventoryId: Id<"inventory">,
+        orderId: Id<"order">,
         action: string
     ) => {
-        if (!inventoryData || !orderData || !orgId || !itemId || !inventoryId) return;
+
+        if (!orgId) return;
         try {
-            if (inventoryId && action === "[STAFF] Add New Item in Inventory") {
+            console.log("[Log Table] - inventoryData", inventoryData)
+            console.log("[Log Table] - orderData", orderData)
+            console.log("[Log Table] - itemId", itemId)
+            console.log("[Log Table] - inventoryId", inventoryId)
+            console.log("[Log Table] - action", action)
+            if (action === "[STAFF] Add New Item in Inventory" && inventoryData) {
                 const res = await addInventory({
                     ...inventoryData,
                     orgId,
@@ -83,12 +96,35 @@ export const RequestsTable = () => {
                 }
             }
 
-            if (inventoryId && action === "[STAFF] Delete Inventory" ) {
+            if (inventoryId && action === "[STAFF] Delete Inventory") {
                 const res = await deleteInventory({
                     itemId: inventoryId,
                 })
 
-                if (res.success === true ) {
+                if (res.success === true) {
+                    clear({ itemId });
+                    toast({
+                        description: "Item deleted successfully.",
+                        variant: "success",
+                        title: "Success",
+                    })
+
+                } else {
+                    toast({
+                        description: "Failed to delete the item. Please try again.",
+                        variant: "destructive",
+                        title: "Error",
+                    })
+                }
+            }
+
+            if (inventoryId && action === "[STAFF] Update Item in Inventory") {
+                const res = await updateInventory({
+                    id: inventoryId,
+                    ...inventoryData,
+                })
+
+                if (res.success === true) {
                     clear({ itemId });
                     toast({
                         description: "Item updated successfully.",
@@ -104,29 +140,7 @@ export const RequestsTable = () => {
                 }
             }
 
-            if (inventoryId && action === "[STAFF] Update Item in Inventory") {
-                const res = await updateInventory({
-                    id: inventoryId,
-                    ...inventoryData,
-                })
-
-                if (res.success === true ) {
-                    clear({ itemId });
-                    toast({
-                        description: "Item deleted successfully.",
-                        variant: "success",
-                        title: "Success",
-                    })
-                } else {
-                    toast({
-                        description: "Failed to delete the item. Please try again.",
-                        variant: "destructive",
-                        title: "Error",
-                    })
-                }
-            }
-
-            if (inventoryId && action === "[STAFF] Create New Order") {
+            if (inventoryId && action === "[STAFF] Create New Order" && orderData) {
                 const res = await addNewOrder({
                     ...orderData,
                     inventoryId,
@@ -138,13 +152,46 @@ export const RequestsTable = () => {
                     toast({
                         title: "Success",
                         description: "Order added successfully.",
+                        variant: "success",
+                    })
+                    router.push("/orders")
+                }
+            }
+            console.log('[REQUEST_TABLE] - action:', action);
+            console.log('[REQUEST_TABLE] - orderData:', orderData);
+            console.log('[REQUEST_TABLE] - orderId:', orderId);
+            console.log('[REQUEST_TABLE] - inventoryId:', inventoryId);
+            if (orderData && orderId && inventoryId && action === "[STAFF] Update Order") {
+                const res = await updateOrder({
+                    id: orderId,
+                    ...orderData,
+                    inventoryId,
+                })
+
+                if (res?.success === true) {
+                    clear({ itemId });
+                    toast({
+                        description: "Order updated successfully.",
+                        variant: "success",
+                        title: "Success",
+                    })
+                }
+                router.push("/orders")
+            } 
+
+            if (orderId && action === "[STAFF] Delete Order") {
+                const res = await deleteOrder({ id: orderId })
+                if (res?.success === true) {
+                    clear({ itemId });
+                    toast({
+                        description: "Order deleted successfully.",
                         variant: "default",
+                        title: "Success",
                     })
                     router.push("/orders")
                 }
             }
 
-            
         } catch (error) {
             console.error(JSON.stringify(error, null, 2));
             toast({
@@ -161,7 +208,7 @@ export const RequestsTable = () => {
 
             if (res) {
                 toast({
-                    description: "Item clearedsuccessfully.",
+                    description: "Item cleared successfully.",
                     variant: "success",
                     title: "Success",
                 })
@@ -186,6 +233,7 @@ export const RequestsTable = () => {
     const isLoading = items === undefined;
 
     if (!isSignedIn) redirect("/");
+
     return (
         <>
             {items && items.length > 0 ? (
@@ -214,11 +262,11 @@ export const RequestsTable = () => {
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                <DropdownMenuItem className="text-indigo-500">View</DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleAddInventory(item.data.inventoryData, item.data.orderData, item._id, item.inventoryId!, item.action!)} className="text-emerald-500">
+                                                <DropdownMenuItem>View</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleAcceptRequests(item.data.inventoryData, item.data.orderData, item._id, item.inventoryId!, item.orderId!, item.action!)}>
                                                     Accept
                                                 </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => handleClearInventory(item._id)} className="text-rose-500">Deny</DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => handleClearInventory(item._id)}>Deny</DropdownMenuItem>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>

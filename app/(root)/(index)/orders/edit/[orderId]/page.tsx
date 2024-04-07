@@ -69,12 +69,9 @@ export default function EditOrderPage({ params }: { params: { orderId: Id<"order
   const router = useRouter();
   const { toast } = useToast();
 
-  const role = orgRole ?? "skip";
-
   const updateOrder = useMutation(api.orders.updateOrder);
   const addToStagingArea = useMutation(api.stagingArea.addToStagingArea);
   const order = useQuery(api.orders.orderToEdit, { orderId: params.orderId });
-  const items = useQuery(api.inventories.getInventories, orgId ? { orgId } : "skip");
 
   useEffect(() => {
     // Update the form default values when 'item' changes
@@ -99,8 +96,9 @@ export default function EditOrderPage({ params }: { params: { orderId: Id<"order
       customer: "",
     }
   })
-
+  const role = orgRole ?? "skip";
   const isSubmitting = form.formState.isSubmitting;
+  const items = useQuery(api.inventories.getInventories, orgId ? { orgId } : "skip");
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const itemToUpdate = items?.find((item) => item.itemName === values.itemName && item.size === values.size && item.orgId === orgId);
@@ -138,9 +136,10 @@ export default function EditOrderPage({ params }: { params: { orderId: Id<"order
         const res = await addToStagingArea({
           orgId,
           orderId: params.orderId,
+          inventoryId: itemToUpdate._id,
           action: "[STAFF] Update Order",
           data: {
-            dataType: "Inventory",
+            dataType: "Order",
             orderData: {
               size: values.size,
               price: parseFloat(values.price),

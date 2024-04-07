@@ -6,7 +6,7 @@ import {
     CardContent,
     CardDescription,
   } from "@/components/ui/card";
-import { RequestsTable } from "./log-table";
+import { RequestsTable } from "./requests-table";
 
 export const RequestsScreen = () => {
     return (

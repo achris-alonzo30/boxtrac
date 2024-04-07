@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { useAuth } from "@clerk/nextjs";
 
 import { PlusCircle } from "lucide-react";
 
@@ -24,12 +22,13 @@ import { OrderReceipt } from "./admin-only/order-receipt";
 import { FilterButton } from "@/components/filter-buttons";
 import { PerformanceCard } from "./admin-only/performance-card";
 
+type BrowserProps = {
+    orgId: string | null;
+    isAdmin: boolean;
+    isStaff: boolean;
+}
 
-export const Browser = () => {
-    const { orgRole, orgId } = useAuth();
-
-    const isAdmin = orgRole === "org:admin";
-    const isStaff = orgRole === "org:member";
+export const Browser = ({ orgId, isAdmin, isStaff }: BrowserProps) => {
 
     return (
         <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -81,7 +80,7 @@ export const Browser = () => {
                                 <div className="ml-auto flex items-center gap-2">
                                     <FilterButton filters={["inStock", "lowStock", "outOfStock"]} />
                                     <Button size="sm" className="h-8 gap-1" asChild>
-                                        <Link href="/inventories/add" className="flex items-center gap-x-2">
+                                        <Link href="/orders/add" className="flex items-center gap-x-2">
                                             <PlusCircle className="h-3.5 w-3.5" />
                                             <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
                                                 New Order

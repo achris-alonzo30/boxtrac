@@ -7,19 +7,22 @@ import { Loader } from "@/components/loader";
 import { Browser } from "./_components/browser/browser";
 
 const OrdersPage = () => {
-    const { isSignedIn, isLoaded } = useAuth();
+    const { isSignedIn, isLoaded, orgId, orgRole } = useAuth();
 
-    if (!isLoaded) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
+  if (!isLoaded) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
 
-    if (!isSignedIn) {
-        redirect("/dashboard");
-    }
+  if (!isSignedIn) {
+    redirect("/");
+  }
 
-    return (
-        <>
-            <Browser />
-        </>
-    )
+  const isAdmin = orgRole === "org:admin";
+  const isStaff = orgRole === "org:member";
+
+  return (
+      <>
+          <Browser orgId={orgId} isAdmin={isAdmin} isStaff={isStaff} />
+      </>
+  )
 }
 
 export default OrdersPage;

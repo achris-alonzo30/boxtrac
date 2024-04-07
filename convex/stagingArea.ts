@@ -16,6 +16,7 @@ export const addToStagingArea = mutation({
     orderId: v.optional(v.id("order")),
   },
   handler: async (ctx, { orgId, action, data, inventoryId, orderId }) => {
+    console.log(orgId)
     const hasAccess = await orgAccess(orgId, ctx);
 
     if (!hasAccess)

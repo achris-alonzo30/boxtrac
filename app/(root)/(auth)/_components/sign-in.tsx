@@ -27,8 +27,6 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast";
 
-
-
 export const SignInScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { isLoaded, signIn, setActive } = useSignIn();
@@ -46,9 +44,10 @@ export const SignInScreen = () => {
   // start the sign up process.
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     if (!isLoaded) return;
-
+    let success = false;
     setIsLoading(true);
     try {
+      success = false;
       const { emailAddress, password } = values;
       const res = await signIn.create({
         identifier: emailAddress,
@@ -57,8 +56,8 @@ export const SignInScreen = () => {
 
       if (res.status === "complete") {
         await setActive({ session: res.createdSessionId })
+        success = true;
         // create user in the backend
-        router.push("/dashboard");
         setIsLoading(false);
       } else {
         console.log(res)
@@ -70,7 +69,18 @@ export const SignInScreen = () => {
         description: "Something went wrong. Please try again.",
         variant: "destructive",
       })
-    } 
+    } finally {
+      loginForm.reset();
+      if (success) {
+        toast({
+        title: "Login Successfully",
+        description: "You've successfully login. We're redirecting you now to main page.",
+        variant: "success",
+      })
+      router.push("/dashboard");
+      }
+      
+    }
   };
 
   return (

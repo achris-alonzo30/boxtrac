@@ -21,6 +21,7 @@ export const addItemToInventory = mutation({
     ctx,
     { size, orgId, price, status, itemName, quantity, supplier }
   ) => {
+    
     const hasAccess = await orgAccess(orgId, ctx);
 
     if (!hasAccess)
@@ -108,23 +109,24 @@ export const deleteItemToInventory = mutation({
 export const updateItemQuantity = internalMutation({
   args: {
     inventoryId: v.id("inventory"),
-    status: v.string(),
     stateQuantity: v.number(),
-    prevStatus: v.string(),
+    refunded: v.boolean(),
+    fulfilled: v.boolean(),
   },
-  handler: async (ctx, { inventoryId, status, stateQuantity, prevStatus } ) => {
+  handler: async (ctx, { inventoryId, stateQuantity, refunded, fulfilled } ) => {
     const item = await ctx.db.get(inventoryId);
 
     if (!item) return null;
+    
     try {
-      if (prevStatus && prevStatus === "Fulfilled" && status === "Refunded") {
+      if (refunded) {
         const quantity = item.quantity + stateQuantity;
         await ctx.db.patch(item?._id, {
           quantity
         })
       }
 
-      if (prevStatus && prevStatus === "Pending" && status === "Fulfilled") {
+      if (fulfilled) {
         const quantity = item.quantity - stateQuantity;
         await ctx.db.patch(item._id, {
           quantity
@@ -168,6 +170,8 @@ export const itemToEdit = query({
     return await ctx.db.get(item.item._id);
   },
 });
+
+
 
 // ################################################################
 // #################### Utility Functions #########################

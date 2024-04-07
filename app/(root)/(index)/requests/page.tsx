@@ -8,7 +8,7 @@ import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
 import { SearchBar } from "@/components/search-bar";
 import { FilterButton } from "@/components/filter-buttons";
-import { RequestsScreen } from "./_components/card-requests-container";
+import { RequestsScreen } from "./_components/requests-screen";
 
 
 
