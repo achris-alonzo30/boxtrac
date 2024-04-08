@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useQuery } from "convex/react";
 import { formatRelative } from "date-fns";
-import { useRouter } from "next/navigation";
 import { api } from "@/convex/_generated/api";
 
 import {
@@ -28,8 +27,8 @@ type OrdersTableProps = {
 
 
 export const OrdersTable = ({ orgId, isAdmin, isStaff }: OrdersTableProps) => {
-    const router = useRouter();
-    const orders = useQuery(api.orders.getOrders, orgId ? { orgId } : "skip");
+    const org = orgId ? orgId : "skip";
+    const orders = useQuery(api.orders.getOrders, {orgId: org});
 
     const isLoading = orders === undefined;
 

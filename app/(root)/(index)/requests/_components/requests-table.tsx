@@ -55,7 +55,8 @@ export const RequestsTable = () => {
     
     // Staging Area Actions
     const clear = useMutation(api.stagingArea.clear);
-    const items = useQuery(api.stagingArea.getItemsInStagingArea, orgId ? { orgId } : "skip");
+    const org = orgId ? orgId : "skip";
+    const items = useQuery(api.stagingArea.getItemsInStagingArea, { orgId: org });
 
     const handleAcceptRequests = async (
         inventoryData: inventoryData,
@@ -155,10 +156,6 @@ export const RequestsTable = () => {
                     clear({ itemId });
                 }
             }
-            console.log('[REQUEST_TABLE] - action:', action);
-            console.log('[REQUEST_TABLE] - orderData:', orderData);
-            console.log('[REQUEST_TABLE] - orderId:', orderId);
-            console.log('[REQUEST_TABLE] - inventoryId:', inventoryId);
             if (orderData && orderId && inventoryId && action === "[STAFF] Update Order") {
                 const res = await updateOrder({
                     id: orderId,
