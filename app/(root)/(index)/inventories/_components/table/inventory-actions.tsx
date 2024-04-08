@@ -32,10 +32,11 @@ import { useToast } from "@/components/ui/use-toast";
 
 
 export const InventoryActions = ({ itemId }: {itemId: Id<"inventory">;}) => {
+    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const { orgId, orgRole } = useAuth();
     const isAdmin = orgRole === "org:admin";
     const isStaff = orgRole === "org:member";
-    const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    
     const { toast } = useToast();
     const router = useRouter();
     

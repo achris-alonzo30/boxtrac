@@ -17,7 +17,7 @@ export const InventoryTable = () => {
     if (!data) return [];
 
     return (
-        <div className="container mx-auto py-10">
+        <div className="container mx-auto">
             <InventoryDataTable columns={columns} data={data} />
         </div>
     )

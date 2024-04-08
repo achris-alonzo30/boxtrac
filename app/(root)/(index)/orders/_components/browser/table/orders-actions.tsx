@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
 import { api } from "@/convex/_generated/api";
@@ -29,15 +30,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
-type InventoryActionsProps = {
-    itemId: Id<"order">;
-    orgId: string | null | undefined;
-    isAdmin: boolean;
-    isStaff: boolean;
-}
 
-export const OrdersActions = ({ itemId, isAdmin, isStaff, orgId }: InventoryActionsProps) => {
+
+export const OrdersActions = ({ itemId }: {itemId: Id<"order">}) => {
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const { orgId, orgRole } = useAuth();
+    const isAdmin = orgRole === "org:admin";
+    const isStaff = orgRole === "org:member";
+
+    
     const { toast } = useToast();
     const router = useRouter();
     

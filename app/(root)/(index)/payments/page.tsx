@@ -9,10 +9,11 @@ import { api } from "@/convex/_generated/api";
 
 
 
-export const InventoryTable = () => {
+export default function DemoPage() {
   const { orgId } = useAuth();
   const org = orgId ? orgId : "skip";
-  const data = useQuery(api.inventories.getInventories, { orgId: org })
+  // const data = useQuery(api.inventories.getInventories, { orgId: org })
+  const data = useQuery(api.orders.getOrders, { orgId: org })
 
   if (!data) return [];
 
