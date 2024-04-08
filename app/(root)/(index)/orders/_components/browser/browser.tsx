@@ -17,12 +17,11 @@ import { FilterButton } from "@/components/filter-buttons";
 import { PerformanceCard } from "./admin-only/performance-card";
 
 type BrowserProps = {
-    orgId: string | null;
     isAdmin: boolean;
     isStaff: boolean;
 }
 
-export const Browser = ({ orgId, isAdmin, isStaff }: BrowserProps) => {
+export const Browser = ({ isAdmin, isStaff }: BrowserProps) => {
 
     return (
         <div className="flex h-full w-full flex-col bg-muted/40">
@@ -45,7 +44,7 @@ export const Browser = ({ orgId, isAdmin, isStaff }: BrowserProps) => {
                                     <Card>
                                         <CardHeaders title="Orders" description="View and manage your orders." />
                                         <CardContent>
-                                            <OrdersTable orgId={orgId ? orgId : "skip"} isAdmin={isAdmin} isStaff={isStaff} />
+                                            <OrdersTable />
                                         </CardContent>
                                     </Card>
                                 </TabsContent>
@@ -68,7 +67,7 @@ export const Browser = ({ orgId, isAdmin, isStaff }: BrowserProps) => {
                                 <Card>
                                     <CardHeaders title="Orders" description="View and manage your orders." />
                                     <CardContent>
-                                        <OrdersTable orgId={orgId ? orgId : "skip"} isAdmin={isAdmin} isStaff={isStaff} />
+                                        <OrdersTable />
                                     </CardContent>
                                     <CardFooter>
                                         <div className="text-xs text-muted-foreground">
