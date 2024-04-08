@@ -1,4 +1,4 @@
-import { 
+import {
     CardTitle,
     CardHeader,
     CardDescription,
@@ -6,9 +6,12 @@ import {
 
 export const CardHeaders = ({ title, description }: { title: string; description?: string }) => {
     return (
-        <CardHeader>
+        <CardHeader >
             <CardTitle>{title}</CardTitle>
             <CardDescription>{description}</CardDescription>
+
+            
         </CardHeader>
+
     );
 }

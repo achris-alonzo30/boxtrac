@@ -13,7 +13,7 @@ import {
     getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 
 import {
     Table,
@@ -22,15 +22,16 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { AddButton } from "@/components/add-buttons";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -69,7 +70,7 @@ export function OrdersDataTable<TData, TValue>({
         <div>
             <div className="flex items-center py-4">
                 <Input
-                    placeholder="Search name..."
+                    placeholder="Search product..."
                     value={(table.getColumn("itemName")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
                         table.getColumn("itemName")?.setFilterValue(event.target.value)
@@ -77,8 +78,8 @@ export function OrdersDataTable<TData, TValue>({
                     className="max-w-sm"
                 />
                 <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto">
+                    <DropdownMenuTrigger asChild >
+                        <Button variant="outline" className="ml-auto mr-2" size="sm">
                             <ListFilterIcon className="h-3.5 w-3.5 mr-1" />
                             <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Filter</span>
                         </Button>
@@ -105,6 +106,7 @@ export function OrdersDataTable<TData, TValue>({
                             })}
                     </DropdownMenuContent>
                 </DropdownMenu>
+                <AddButton route="/orders/add" btnName="New Order" />
             </div>
             <div className="rounded-md border">
                 <Table>
@@ -143,7 +145,7 @@ export function OrdersDataTable<TData, TValue>({
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No results.
+                                    No Orders.
                                 </TableCell>
                             </TableRow>
                         )}

@@ -16,11 +16,10 @@ const OrdersPage = () => {
   }
 
   const isAdmin = orgRole === "org:admin";
-  const isStaff = orgRole === "org:member";
 
   return (
       <>
-          <Browser isAdmin={isAdmin} isStaff={isStaff} />
+          <Browser isAdmin={isAdmin}  />
       </>
   )
 }

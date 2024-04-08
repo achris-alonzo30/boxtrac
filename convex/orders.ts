@@ -175,6 +175,86 @@ export const orderToEdit = query({
   }
 })
 
+export const getTotalOrders = query({
+  args: { orgId: v.string() },
+  handler: async (ctx, { orgId }) => {
+    const hasAccess = await orgAccess(orgId, ctx);
+
+    if (!hasAccess) return 0;
+
+    const orders = await ctx.db
+      .query("order")
+      .withIndex("byOrgId", (q) => q.eq("orgId", orgId))
+      .collect();
+
+    if (!orders) return [];
+
+    const currentDate = new Date(); // Get the current date
+
+    // Calculate the start and end date for the current week
+    const currentWeekStart = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate() - currentDate.getDay() + 1
+    );
+    const currentWeekEnd = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate() + (6 - currentDate.getDay())
+    );
+
+    // Calculate the start and end date for the current month
+    const currentMonthStart = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      1
+    );
+    const currentMonthEnd = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      0
+    );
+
+    // Calculate the start and end date for the current year
+    const currentYearStart = new Date(currentDate.getFullYear(), 0, 1);
+    const currentYearEnd = new Date(currentDate.getFullYear(), 11, 31);
+
+    // Filter orders based on their creation time within each time period
+    const weeklyOrders = orders.filter((order) => {
+      const orderCreationTime = new Date(order._creationTime);
+      return (
+        orderCreationTime >= currentWeekStart && orderCreationTime <= currentWeekEnd
+      );
+    });
+
+    const monthlyOrders = orders.filter((order) => {
+      const orderCreationTime = new Date(order._creationTime);
+      return (
+        orderCreationTime >= currentMonthStart &&
+        orderCreationTime <= currentMonthEnd
+      );
+    });
+
+    const yearlyOrders = orders.filter((order) => {
+      const orderCreationTime = new Date(order._creationTime);
+      return (
+        orderCreationTime >= currentYearStart && orderCreationTime <= currentYearEnd
+      );
+    });
+
+    // Calculate total profit for each time period
+    const weeklyProfit = weeklyOrders.reduce((acc, order) => acc + order.price, 0);
+    const monthlyProfit = monthlyOrders.reduce((acc, order) => acc + order.price, 0);
+    const yearlyProfit = yearlyOrders.reduce((acc, order) => acc + order.price, 0);
+
+    return {
+      weeklyProfit,
+      monthlyProfit,
+      yearlyProfit,
+    };
+  },
+});
+
 
 
 // ################################################################

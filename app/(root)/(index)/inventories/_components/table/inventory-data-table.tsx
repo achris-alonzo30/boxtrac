@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { AddButton } from "@/components/add-buttons"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -69,7 +70,7 @@ export function InventoryDataTable<TData, TValue>({
         <div>
             <div className="flex items-center py-4">
                 <Input
-                    placeholder="Search name..."
+                    placeholder="Search product..."
                     value={(table.getColumn("itemName")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
                         table.getColumn("itemName")?.setFilterValue(event.target.value)
@@ -78,7 +79,7 @@ export function InventoryDataTable<TData, TValue>({
                 />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto">
+                        <Button variant="outline" className="ml-auto mr-2" size="sm">
                             <ListFilterIcon className="h-3.5 w-3.5 mr-1" />
                             <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">Filter</span>
                         </Button>
@@ -105,6 +106,7 @@ export function InventoryDataTable<TData, TValue>({
                             })}
                     </DropdownMenuContent>
                 </DropdownMenu>
+                <AddButton route="/inventories/add" btnName="Add Inventory" />
             </div>
             <div className="rounded-md border">
                 <Table>
@@ -143,7 +145,7 @@ export function InventoryDataTable<TData, TValue>({
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No results.
+                                    No Inventory.
                                 </TableCell>
                             </TableRow>
                         )}

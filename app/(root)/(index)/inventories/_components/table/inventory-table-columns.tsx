@@ -121,7 +121,7 @@ export const columns: ColumnDef<Doc<"inventory">>[] = [
             const payment = row.original
 
             return (
-                <InventoryActions itemId={payment?._id} />
+                <InventoryActions itemId={payment._id} />
             )
         },
     },
