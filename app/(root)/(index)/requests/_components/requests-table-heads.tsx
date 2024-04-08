@@ -1,6 +1,6 @@
 import { TableHead, TableRow } from "@/components/ui/table"
 
-export const RequestTableHeads = () => {
+export const RequestsTableHeads = () => {
     return (
         <TableRow>
             <TableHead>Date</TableHead>
