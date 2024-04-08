@@ -7,7 +7,7 @@ import { Loader } from "@/components/loader";
 import { Browser } from "./_components/browser/browser";
 
 const OrdersPage = () => {
-    const { isSignedIn, isLoaded, orgId, orgRole } = useAuth();
+    const { isSignedIn, isLoaded, orgRole } = useAuth();
 
   if (!isLoaded) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
 
@@ -20,7 +20,7 @@ const OrdersPage = () => {
 
   return (
       <>
-          <Browser orgId={orgId} isAdmin={isAdmin} isStaff={isStaff} />
+          <Browser isAdmin={isAdmin} isStaff={isStaff} />
       </>
   )
 }
