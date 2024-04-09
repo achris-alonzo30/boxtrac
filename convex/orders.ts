@@ -1,8 +1,9 @@
 import { ConvexError, v } from "convex/values";
 import { MutationCtx, QueryCtx, mutation, query } from "./_generated/server";
-import { inventoryAccess, orgAccess } from "./inventories";
+import { orgAccess } from "./inventories";
 import { internal } from "./_generated/api";
 import { Id } from "./_generated/dataModel";
+import { currentMonthEnd, currentMonthStart, currentWeekEnd, currentWeekStart, currentYearEnd, currentYearStart } from "@/lib/utils";
 
 // ################################################################
 // ######################## Mutations #############################
@@ -178,9 +179,17 @@ export const orderToEdit = query({
 export const getTotalOrders = query({
   args: { orgId: v.string() },
   handler: async (ctx, { orgId }) => {
-    const hasAccess = await orgAccess(orgId, ctx);
+    const identity = await ctx.auth.getUserIdentity();
 
-    if (!hasAccess) return 0;
+    if (!identity) return null;
+
+    const user = await ctx.db.query("users").withIndex("by_tokenIdentifier", (q) => q.eq("tokenIdentifier", identity.tokenIdentifier)).first();
+
+    if (!user) return null;
+
+    const hasAccess = user.orgIds.some((id) => id.orgId === orgId ) || user.tokenIdentifier.includes(orgId);
+
+    if (!hasAccess) return null;
 
     const orders = await ctx.db
       .query("order")
@@ -189,7 +198,130 @@ export const getTotalOrders = query({
 
     if (!orders) return [];
 
+
+    // *************************** WEEKLY ORDERS *************************** \\
+    const prevWeekStart = new Date(currentWeekStart);
+    prevWeekStart.setDate(prevWeekStart.getDate() - 7);
+    const prevWeekEnd = new Date(currentWeekEnd);
+    prevWeekEnd.setDate(prevWeekEnd.getDate() - 7);
+
+    const curWeeklyOrders = orders.filter((order) => {
+      const orderCreationTime = new Date(order._creationTime);
+      return (
+        orderCreationTime >= currentWeekStart && orderCreationTime <= currentWeekEnd
+      )
+    })
+
+    const prevWeeklyOrders = orders.filter((order) => {
+      const orderCreationTime = new Date(order._creationTime);
+      return (
+        orderCreationTime >= prevWeekStart && orderCreationTime <= prevWeekEnd
+      )
+    })
+
+    // *************************** MONTHLY ORDERS *************************** \\
+    const prevMonthStart = new Date(currentMonthStart);
+    prevMonthStart.setMonth(prevMonthStart.getMonth() - 1);
+    const prevMonthEnd = new Date(currentMonthEnd);
+    prevMonthEnd.setMonth(prevMonthEnd.getMonth() - 1);
+
+
+    const curMonthlyOrders = orders.filter((order) => {
+      const orderCreationTime = new Date(order._creationTime);
+      return (
+        orderCreationTime >= currentMonthStart && orderCreationTime <= currentMonthEnd
+      )
+    })
+
+    const prevMonthlyOrders = orders.filter((order) => {
+      const orderCreationTime = new Date(order._creationTime);
+      return (
+        orderCreationTime >= prevMonthStart && orderCreationTime <= prevMonthEnd
+      )
+    })
+
+    // *************************** YEARLY ORDERS *************************** \\
+    const prevYearStart = new Date(currentYearStart);
+    prevYearStart.setFullYear(prevYearStart.getFullYear() - 1);
+    const prevYearEnd = new Date(currentYearEnd);
+    prevYearEnd.setFullYear(prevYearEnd.getFullYear() - 1);
     
+    const curYearlyOrders = orders.filter((order) => {
+      const orderCreationTime = new Date(order._creationTime);
+      return (
+        orderCreationTime >= currentYearStart && orderCreationTime <= currentYearEnd
+      )
+    })
+
+    const prevYearlyOrders = orders.filter((order) => {
+      const orderCreationTime = new Date(order._creationTime);
+      return (
+        orderCreationTime >= prevYearStart && orderCreationTime <= prevYearEnd
+      )
+    })
+
+    // *************************** WEEKLY PROFIT *************************** \\
+    const curWeeklyProfit = curWeeklyOrders.reduce(
+      (acc, order) => acc + order.price * order.quantity,
+      0
+    );
+
+    const prevWeeklyProfit = prevWeeklyOrders.reduce(
+      (acc, order) => acc + order.price * order.quantity,
+      0
+    )
+
+    let weeklyPercentChange = 0;
+    if (prevWeeklyProfit > 0) {
+      weeklyPercentChange = ((curWeeklyProfit - prevWeeklyProfit) / prevWeeklyProfit) * 100
+    } else {
+      weeklyPercentChange = 100
+    }
+    
+    // *************************** MONTHLY PROFIT *************************** \\
+    const curMonthlyProfit = curMonthlyOrders.reduce(
+      (acc, order) => acc + order.price * order.quantity,
+      0
+    )
+
+    const prevMonthlyProfit = prevMonthlyOrders.reduce(
+      (acc, order) => acc + order.price * order.quantity,
+      0
+    )
+
+    let monthlyPercentChange = 0;
+    if (prevMonthlyProfit > 0) {
+      monthlyPercentChange = ((curMonthlyProfit - prevMonthlyProfit) / prevMonthlyProfit) * 100
+    } else {
+      monthlyPercentChange = 100
+    }
+
+    // *************************** YEARLY PROFIT *************************** \\
+    const curYearlyProfit = curYearlyOrders.reduce(
+      (acc, order) => acc + order.price * order.quantity,
+      0
+    )
+
+    const prevYearlyProfit = prevYearlyOrders.reduce(
+      (acc, order) => acc + order.price * order.quantity,
+      0
+    )
+
+    let yearlyPercentChange = 0;
+    if (prevYearlyProfit > 0) {
+      yearlyPercentChange = ((curYearlyProfit - prevYearlyProfit) / prevYearlyProfit) * 100
+    } else {
+      yearlyPercentChange = 100
+    }
+    
+    return {
+      curWeeklyProfit,
+      curMonthlyProfit,
+      curYearlyProfit,
+      weeklyPercentChange,
+      monthlyPercentChange,
+      yearlyPercentChange
+    }
   },
 });
 

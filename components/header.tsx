@@ -26,7 +26,6 @@ export const Header = () => {
                 <ModeToggle />
                 <UserButton afterSignOutUrl="/" />
             </SignedIn>
-            
         </header>
     )
 }

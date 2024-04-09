@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
 
-import { 
+import {
     Users,
-    Activity, 
+    Activity,
     CreditCard,
     DollarSign,
-    ArrowUpRight,    
+    ArrowUpRight,
 } from "lucide-react";
 
 import {
@@ -30,12 +32,20 @@ import {
     AvatarImage,
     AvatarFallback,
 } from "@/components/ui/avatar";
+import { Loader } from "@/components/loader";
 import { Header } from "@/components/header";
 import { Badge } from "@/components/ui/badge";
 import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 
 const DashboardPage = () => {
+    const { isSignedIn, isLoaded, orgRole } = useAuth();
+
+    if (!isLoaded) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
+
+    if (!isSignedIn || orgRole !== "org:admin") {
+        redirect("/");
+    }
     return (
         <div className="flex h-full w-full flex-col bg-muted/40">
             <Sidebar />

@@ -1,3 +1,6 @@
+"use client";
+
+import { useAuth } from "@clerk/nextjs";
 
 import {
     Link,
@@ -19,8 +22,9 @@ import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 
 
-
 export const MobileSidebar = () => {
+    const { orgRole } = useAuth();
+    const isAdmin = orgRole === "org:admin";
     return (
         <Sheet>
             <SheetTrigger asChild>
@@ -32,13 +36,16 @@ export const MobileSidebar = () => {
             <SheetContent side="left" className="sm:max-w-xs">
                 <nav className="grid gap-6 text-lg font-medium">
                     <Logo />
-                    <Link
-                        href="/dashboard"
-                        className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                    >
-                        <LayoutGrid className="h-5 w-5" />
-                        Dashboard
-                    </Link>
+                    {isAdmin && (
+                        <Link
+                            href="/dashboard"
+                            className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                        >
+                            <LayoutGrid className="h-5 w-5" />
+                            Dashboard
+                        </Link>
+                    )}
+
                     <Link
                         href="/orders"
                         className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
@@ -53,21 +60,27 @@ export const MobileSidebar = () => {
                         <Package className="h-5 w-5" />
                         Inventories
                     </Link>
-                    <Link
-                        href="/requests"
-                        className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                    >
-                        <GitPullRequest className="h-5 w-5" />
-                        <span className="sr-only">Requests</span>
-                        {/* Add the number of requests in here */}
-                    </Link>
-                    <Link
-                        href="/logs"
-                        className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
-                    >
-                        <ScrollText className="h-5 w-5" />
-                        <span className="sr-only">Logs</span>
-                    </Link>
+                    {isAdmin && (
+                        <Link
+                            href="/requests"
+                            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                        >
+                            <GitPullRequest className="h-5 w-5" />
+                            <span className="sr-only">Requests</span>
+                            {/* Add the number of requests in here */}
+                        </Link>
+                    )}
+
+                    {isAdmin && (
+                        <Link
+                            href="/logs"
+                            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                        >
+                            <ScrollText className="h-5 w-5" />
+                            <span className="sr-only">Logs</span>
+                        </Link>
+                    )}
+
                     <Link
                         href="#"
                         className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"

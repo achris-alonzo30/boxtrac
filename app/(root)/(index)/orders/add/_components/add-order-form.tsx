@@ -3,13 +3,19 @@
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 
-import { Loader2, ChevronLeft, TriangleAlert, OctagonAlert, CircleCheck } from "lucide-react"
+import {
+    CircleCheck,
+    ChevronLeft,
+    OctagonAlert,
+    TriangleAlert,
+} from "lucide-react"
 
 import {
     Form,
@@ -18,14 +24,9 @@ import {
     FormLabel,
     FormControl,
     FormMessage,
+    FormDescription,
 } from "@/components/ui/form";
-import {
-    Card,
-    CardTitle,
-    CardHeader,
-    CardContent,
-    CardDescription,
-} from "@/components/ui/card";
+
 import {
     Table,
     TableBody,
@@ -34,6 +35,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+
 import {
     Select,
     SelectItem,
@@ -47,8 +49,10 @@ import { Loader } from "@/components/loader";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { OrderAddActionButtons } from "./order-add-action-buttons";
 import { CardHeaders } from "@/components/card-headers";
+import { Card, CardContent } from "@/components/ui/card";
+import { OrderAddActionButtons } from "./order-add-action-buttons";
+
 
 const formSchema = z.object({
     size: z.string().min(1),
@@ -66,6 +70,8 @@ type AddInventoryFormProps = {
 }
 
 export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps) => {
+    const [chosenItem, setChosenItem] = useState("");
+    const [disabled, setDisabled] = useState(false);
     const router = useRouter();
     const { toast } = useToast();
 
@@ -83,10 +89,13 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
             customer: "",
         }
     })
-
-    const chosenItem = form.getValues("itemName")
     const isSubmitting = form.formState.isSubmitting;
+
     const items = useQuery(api.inventories.getInventories, orgId ? { orgId } : "skip");
+    const isLoading = items === undefined;
+
+    const itemNames = Array.from(new Set(items?.map((item) => ({ itemName: item.itemName, status: item.status }))));
+
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         const itemToUpdate = items?.find((item) => item.itemName === values.itemName && item.size === values.size && item.orgId === orgId);
@@ -162,10 +171,11 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
         }
     }
 
-    const isLoading = items === undefined;
+    const handleItemChange = (val: string) => {
+        setChosenItem(val);
+    }
 
-    const itemNames = Array.from(new Set(items?.map((item) => ({ itemName: item.itemName, status: item.status }))));
-    const itemSizes = Array.from(new Set(items?.filter(item => item.itemName === chosenItem).map(item => item.size)));
+    console.log(chosenItem)
 
     return (
         <Form {...form}>
@@ -180,7 +190,7 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
                             <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
                                 Add New Order
                             </h1>
-                            <OrderAddActionButtons form={form} isLoading={isLoading} largeScreen />
+                            <OrderAddActionButtons form={form} isLoading={isSubmitting} largeScreen />
                         </div>
                         {isLoading && <Loader text="Loading Order" />}
                         <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
@@ -196,7 +206,10 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
                                                     render={({ field }) => (
                                                         <FormItem>
                                                             <FormLabel>Choose Product</FormLabel>
-                                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                            <Select onValueChange={(val) => {
+                                                                field.onChange(val);
+                                                                handleItemChange(val);
+                                                            }} defaultValue={field.value}>
                                                                 <FormControl>
                                                                     <SelectTrigger>
                                                                         <SelectValue placeholder="Item Name" />
@@ -244,14 +257,14 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
                                     <CardContent>
                                         <Table>
                                             <TableHeader>
-                                                <TableRow>
+                                                <TableRow >
                                                     <TableHead>Quantity</TableHead>
                                                     <TableHead>Price</TableHead>
                                                     <TableHead>Size</TableHead>
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
-                                                <TableRow>
+                                                <TableRow >
                                                     <TableCell>
                                                         <FormField
                                                             control={form.control}
@@ -261,6 +274,11 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
                                                                     <FormControl>
                                                                         <Input id="quantity" min="0" placeholder="99" type="number" {...field} />
                                                                     </FormControl>
+                                                                    {items?.filter((item) => item.itemName === chosenItem).map((item, index) => (
+                                                                        <FormDescription key={index} className="text-muted-foreground text-sm">
+                                                                            Cannot Exceed: {item.quantity}
+                                                                        </FormDescription>
+                                                                    ))}
                                                                     <FormMessage />
                                                                 </FormItem>
                                                             )}
@@ -279,6 +297,11 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
                                                                         </div>
 
                                                                     </FormControl>
+                                                                    {items?.filter((item) => item.itemName === chosenItem).map((item, index) => (
+                                                                        <FormDescription key={index} className="text-muted-foreground text-sm">
+                                                                            Product Selected Price: ₱{item.price}
+                                                                        </FormDescription>
+                                                                    ))}
                                                                     <FormMessage />
                                                                 </FormItem>
                                                             )}
@@ -299,8 +322,8 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
                                                                         <SelectContent>
                                                                             <SelectGroup>
                                                                                 <SelectLabel>Available Sizes</SelectLabel>
-                                                                                {itemSizes?.map((item, index) => (
-                                                                                    <SelectItem key={index} value={item}>{item}</SelectItem>
+                                                                                {items?.filter(item => item.itemName === chosenItem).map((item, index) => (
+                                                                                    <SelectItem key={index} value={item.size} disabled={item.status === "Out Of Stock"}>{item.size}</SelectItem>
                                                                                 ))}
                                                                             </SelectGroup>
                                                                         </SelectContent>
@@ -350,7 +373,7 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
                                 </Card>
                             </div>
                         </div>
-                        <OrderAddActionButtons form={form} isLoading={isLoading} smallScreen />
+                        <OrderAddActionButtons form={form} isLoading={isSubmitting} smallScreen />
                     </div>
                 </main>
             </form>

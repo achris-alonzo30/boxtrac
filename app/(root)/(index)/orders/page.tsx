@@ -16,7 +16,6 @@ const OrdersPage = () => {
   }
 
   const isAdmin = orgRole === "org:admin";
-
   return (
       <>
           <Browser isAdmin={isAdmin}  />
