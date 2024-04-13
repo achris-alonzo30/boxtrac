@@ -13,7 +13,7 @@ export const AnimationLottie = ({ animationPath, width }: AnimationLottieProps) 
     autoplay: true,
     animationData: animationPath,
     style: {
-      width: '95%',
+      width: "25%",
     }
   };
 
