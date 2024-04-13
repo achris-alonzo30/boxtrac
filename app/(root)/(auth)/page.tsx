@@ -1,7 +1,7 @@
 "use client";
 
 import { redirect } from "next/navigation";
-import { useConvexAuth } from "convex/react";
+import { useAuth } from "@clerk/nextjs";
 import {
     Tabs,
     TabsList,
@@ -13,12 +13,14 @@ import { SignUpScreen } from "./_components/sign-up";
 import { SignInScreen } from "./_components/sign-in";
 
 const AuthPage = () => {
-    const { isAuthenticated, isLoading } = useConvexAuth();
+    const { orgRole, isSignedIn, isLoaded } = useAuth();
 
-    if (isLoading) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
+    if (!isLoaded) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
 
-    if (isAuthenticated) {
+    if (isSignedIn && orgRole === "org:admin") {
         redirect("/dashboard");
+    } else if (isSignedIn && orgRole === "org:member") {
+        redirect("/inventories");
     }
     
     return (

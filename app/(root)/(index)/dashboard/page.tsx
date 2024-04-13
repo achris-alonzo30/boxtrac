@@ -46,6 +46,8 @@ const DashboardPage = () => {
     if (!isSignedIn || orgRole !== "org:admin") {
         redirect("/");
     }
+
+    
     return (
         <div className="flex h-full w-full flex-col bg-muted/40">
             <Sidebar />
