@@ -1,7 +1,7 @@
 "use client";
 
 import { redirect } from "next/navigation";
-import { useConvexAuth } from "convex/react";
+import { useAuth } from "@clerk/nextjs";
 
 import {
   Card,
@@ -14,20 +14,21 @@ import { CardHeaders } from "@/components/card-headers";
 import { InventoryTable } from "./_components/table/inventory-table";
 
 const InventoryPage = () => {
-  const { isAuthenticated, isLoading } = useConvexAuth();
+  const { isSignedIn, isLoaded, orgRole } = useAuth();
 
-  if (!isAuthenticated) {
+  if (!isSignedIn) {
     redirect("/");
   }
 
-  if (isLoading) <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
+  if (!isLoaded) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
 
+  const isAdmin = orgRole === "org:admin";
   
   return (
     <div className="flex h-full w-full flex-col bg-muted/40">
-      <Sidebar />
+      <Sidebar isAdmin={isAdmin} />
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-        <Header />
+        <Header isAdmin={isAdmin} />
         <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
           <Card>
               <CardHeaders title="Inventory" description="Manage and keep track of your inventory."/>

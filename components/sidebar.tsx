@@ -18,13 +18,11 @@ import { Logo } from "@/components/logo";
 import { ActionTooltip } from "@/components/action-tooltip";
 
 
-export const Sidebar = () => {
+export const Sidebar = ({ isAdmin }: { isAdmin: boolean }) => {
     const pathname = usePathname();
     const router = useRouter();
-    const { orgRole } = useAuth();
     const { signOut } = useClerk();
 
-    const isAdmin = orgRole === "org:admin";
     const handleSignOut = () => {
         signOut();
         router.push("/")

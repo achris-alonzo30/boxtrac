@@ -22,11 +22,9 @@ import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 
 
-export const MobileSidebar = () => {
-    const { orgRole } = useAuth();
+export const MobileSidebar = ({ isAdmin }: { isAdmin: boolean }) => {
     const { signOut } = useClerk();
     const router = useRouter();
-    const isAdmin = orgRole === "org:admin";
 
     const handleSignOut = () => {
         signOut();

@@ -14,7 +14,7 @@ import { SignUpScreen } from "./_components/sign-up";
 import { SignInScreen } from "./_components/sign-in";
 
 const AuthPage = () => {
-    const { orgRole, isSignedIn, isLoaded } = useAuth();
+    const { orgRole, isSignedIn } = useAuth();
 
     useEffect(() => {
         if (isSignedIn) {
@@ -25,8 +25,6 @@ const AuthPage = () => {
             }
         }
     }, [isSignedIn, orgRole]);
-
-    if (!isLoaded) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
     
     return (
         <div className="max-w-lg flex flex-col h-full items-center justify-center mx-auto my-8">

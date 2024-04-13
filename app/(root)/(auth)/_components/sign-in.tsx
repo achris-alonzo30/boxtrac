@@ -41,27 +41,29 @@ export const SignInScreen = () => {
   })
   // start the sign up process.
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {
-    if (!isLoaded) return;
     setIsLoading(true);
     try {
       const { emailAddress, password } = values;
-      const res = await signIn.create({
-        identifier: emailAddress,
-        password,
-      });
+      if (isLoaded) {
+        const res = await signIn.create({
+          identifier: emailAddress,
+          password,
+        });
 
-      if (res.status === "complete") {
-        toast({
-          title: "Login Successfully",
-          description: "You've successfully login. We're redirecting you now to main page.",
-          variant: "success",
-        })
-        await setActive({ session: res.createdSessionId })
-        // create user in the backend
-        setIsLoading(false);
-      } else {
-        console.log(res)
-      }
+        if (res.status === "complete") {
+          toast({
+            title: "Login Successfully",
+            description: "You've successfully login. We're redirecting you now to main page.",
+            variant: "success",
+          })
+          await setActive({ session: res.createdSessionId })
+          // create user in the backend
+          setIsLoading(false);
+        } else {
+          console.log(res)
+        }
+    }
+      
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
       toast({

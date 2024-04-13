@@ -60,16 +60,18 @@ export const SignUpScreen = () => {
     setIsLoading(true);
     try {
       const { emailAddress, password, firstName, lastName } = values;
-      await signUp.create({
-        emailAddress,
-        password,
-        firstName,
-        lastName,
-      });
+      if (isLoaded) {
+        await signUp.create({
+          emailAddress,
+          password,
+          firstName,
+          lastName,
+        });
 
-      // send the email.
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-      setPendingVerification(true);
+        // send the email.
+        await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+        setPendingVerification(true);
+      }
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
       toast({

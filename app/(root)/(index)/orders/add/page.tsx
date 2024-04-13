@@ -17,9 +17,9 @@ const AddOrderPage = () => {
 
   return (
     <div className="flex h-full w-full flex-col bg-muted/40">
-      <Sidebar />
+      <Sidebar isAdmin={isAdmin} />
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
-        <Header />
+        <Header isAdmin={isAdmin} />
         <AddOrderForm orgId={orgId} isAdmin={isAdmin} isStaff={isStaff} />
       </div>
     </div >
