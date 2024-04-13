@@ -1,5 +1,5 @@
 "use client";
- 
+
 import { useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
@@ -13,17 +13,20 @@ const RequestsPage = () => {
   const { isSignedIn, isLoaded, orgRole, orgId } = useAuth();
 
   useEffect(() => {
-    if (isSignedIn) {
+    if (!isSignedIn) {
+      redirect("/");
+    } else if (isSignedIn) {
       if (orgRole !== "org:admin") {
-        redirect("/");
-      }} 
+        redirect("/inventories");
+      }
+    }
   }, [isSignedIn, orgRole]);
 
   if (!isLoaded) return <div className="flex min-h-screen items-center justify-center"><Loader text="Loading..." /></div>;
-  
+
   const id = orgId ? orgId : "skip"
   const isAdmin = orgRole === "org:admin";
-  
+
   return (
     <div className="flex h-full w-full flex-col bg-muted/40">
       <Sidebar isAdmin={isAdmin} />
