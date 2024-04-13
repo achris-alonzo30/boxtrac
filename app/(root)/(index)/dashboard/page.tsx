@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 
@@ -41,13 +42,16 @@ import { Button } from "@/components/ui/button";
 const DashboardPage = () => {
     const { isSignedIn, isLoaded, orgRole } = useAuth();
 
+    useEffect(() => {
+        if (isSignedIn) {
+            if (orgRole !== "org:admin") {
+                redirect("/inventories");
+            }
+        }
+    }, [isSignedIn, orgRole]);
+
     if (!isLoaded) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
 
-    if (!isSignedIn || orgRole !== "org:admin") {
-        redirect("/");
-    }
-
-    
     return (
         <div className="flex h-full w-full flex-col bg-muted/40">
             <Sidebar />

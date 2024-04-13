@@ -2,11 +2,11 @@
 
 
 import Image from "next/image";
+import { useQuery } from "convex/react";
 import { useAuth } from "@clerk/nextjs";
 import { formatRelative } from "date-fns";
 import { api } from "@/convex/_generated/api";
 import { transformStockText } from "@/lib/utils";
-import { useQuery } from "convex/react";
 
 import {
   Table,

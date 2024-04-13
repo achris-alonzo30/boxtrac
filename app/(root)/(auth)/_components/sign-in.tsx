@@ -4,7 +4,6 @@ import { z } from "zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSignIn } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
@@ -31,7 +30,6 @@ export const SignInScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { isLoaded, signIn, setActive } = useSignIn();
 
-  const router = useRouter();
   const { toast } = useToast();
 
   const loginForm = useForm<z.infer<typeof loginSchema>>({
@@ -44,10 +42,8 @@ export const SignInScreen = () => {
   // start the sign up process.
   const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     if (!isLoaded) return;
-    let success = false;
     setIsLoading(true);
     try {
-      success = false;
       const { emailAddress, password } = values;
       const res = await signIn.create({
         identifier: emailAddress,
@@ -55,8 +51,12 @@ export const SignInScreen = () => {
       });
 
       if (res.status === "complete") {
+        toast({
+          title: "Login Successfully",
+          description: "You've successfully login. We're redirecting you now to main page.",
+          variant: "success",
+        })
         await setActive({ session: res.createdSessionId })
-        success = true;
         // create user in the backend
         setIsLoading(false);
       } else {
@@ -70,17 +70,7 @@ export const SignInScreen = () => {
         variant: "destructive",
       })
     } finally {
-      
-      if (success) {
-        toast({
-          title: "Login Successfully",
-          description: "You've successfully login. We're redirecting you now to main page.",
-          variant: "success",
-        })
-        router.push("/dashboard");
-      }
       loginForm.reset();
-
     }
   };
 

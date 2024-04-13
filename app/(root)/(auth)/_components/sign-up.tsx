@@ -57,10 +57,8 @@ export const SignUpScreen = () => {
   // start the sign up process.
   const handleRegister = async (values: z.infer<typeof registerSchema>) => {
     if (!isLoaded) return;
-    let success = false;
     setIsLoading(true);
     try {
-      success = false;
       const { emailAddress, password, firstName, lastName } = values;
       await signUp.create({
         emailAddress,
@@ -71,7 +69,6 @@ export const SignUpScreen = () => {
 
       // send the email.
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-      success = true;
       setPendingVerification(true);
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
@@ -83,23 +80,14 @@ export const SignUpScreen = () => {
     } finally {
       setIsLoading(false);
       registerForm.reset();
-      if (success) {
-        toast({
-          title: "Account Created",
-          description: "We've sent you an email. Please check your inbox and verify your account.",
-          variant: "success",
-        })
-      }
     }
   };
 
   // This verifies the user using email code that is delivered.
   const handleVerify = async (values: z.infer<typeof verifyAccountSchema>) => {
     if (!isLoaded) return;
-    let success = false;
     setIsLoading(true);
     try {
-      success = false;
       const { code } = values;
       const completeSignUp = await signUp.attemptEmailAddressVerification({
         code,
@@ -109,7 +97,12 @@ export const SignUpScreen = () => {
       }
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId })
-        success = true;
+        toast({
+          title: "Account Created",
+          description: "You're account has been created. We're redirecting you now to the main page.",
+          variant: "success",
+        })
+        router.push("/dashboard")
       }
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
@@ -121,15 +114,6 @@ export const SignUpScreen = () => {
     } finally {
       setIsLoading(false);
       codeForm.reset();
-      if (success) {
-        toast({
-          title: "Account Created",
-          description: "You're account has been created. We're redirecting you now to the main page.",
-          variant: "success",
-        })
-        
-        router.push("/dashboard");
-      }
     }
   };
 

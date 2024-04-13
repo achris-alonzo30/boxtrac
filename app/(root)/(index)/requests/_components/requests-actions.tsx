@@ -40,7 +40,15 @@ type RequestsActionsProps = {
     inventoryId?: Id<"inventory"> | undefined;
 }
 
-export const RequestsActions = ({ orgId, stagingAreaId, action, orderData, orderId, inventoryData, inventoryId }: RequestsActionsProps) => {
+export const RequestsActions = ({ 
+    orgId, 
+    stagingAreaId, 
+    action, 
+    orderData, 
+    orderId, 
+    inventoryData, 
+    inventoryId 
+}: RequestsActionsProps) => {
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
     const router = useRouter();
     const { toast } = useToast();
@@ -67,10 +75,7 @@ export const RequestsActions = ({ orgId, stagingAreaId, action, orderData, order
         action: string
     ) => {
         if (!orgId) return;
-        let success = false;
         try {
-            console.log(itemId)
-            success = false;
             if (action === "[STAFF] Add New Item in Inventory" && inventoryData) {
                 const res = await addInventory({
                     ...inventoryData,
@@ -83,9 +88,8 @@ export const RequestsActions = ({ orgId, stagingAreaId, action, orderData, order
                         variant: "success",
                         title: "Success",
                     })
-                    success = true;
-                    clear({ itemId });
-
+                    clear({ itemId });  
+                    router.push("/inventories")
                 } else {
                     toast({
                         description: "Failed to add the item. Please try again.",
@@ -106,8 +110,8 @@ export const RequestsActions = ({ orgId, stagingAreaId, action, orderData, order
                         variant: "success",
                         title: "Success",
                     })
-                    success = true;
                     clear({ itemId });
+                    router.push("/inventories")
                 } else {
                     toast({
                         description: "Failed to delete the item. Please try again.",
@@ -129,8 +133,8 @@ export const RequestsActions = ({ orgId, stagingAreaId, action, orderData, order
                         variant: "success",
                         title: "Success",
                     })
-                    success = true;
                     clear({ itemId });
+                    router.push("/inventories")
                 } else {
                     toast({
                         description: "Failed to update the item. Please try again.",
@@ -153,8 +157,8 @@ export const RequestsActions = ({ orgId, stagingAreaId, action, orderData, order
                         description: "Order added successfully.",
                         variant: "success",
                     })
-                    success = true;
                     clear({ itemId });
+                    router.push("/inventories")
                 }
             }
             if (orderData && orderId && inventoryId && action === "[STAFF] Update Order") {
@@ -170,8 +174,8 @@ export const RequestsActions = ({ orgId, stagingAreaId, action, orderData, order
                         variant: "success",
                         title: "Success",
                     })
-                    success = true;
                     clear({ itemId });
+                    router.push("/inventories")
                 }
             }
 
@@ -183,8 +187,8 @@ export const RequestsActions = ({ orgId, stagingAreaId, action, orderData, order
                         variant: "default",
                         title: "Success",
                     })
-                    success = true;
                     clear({ itemId });
+                    router.push("/inventories")
                 }
             }
 
@@ -195,16 +199,10 @@ export const RequestsActions = ({ orgId, stagingAreaId, action, orderData, order
                 variant: "destructive",
                 title: "Error",
             })
-        } finally {
-            if (success) {
-                router.push("/inventories")
-            }
-        }
+        } 
     }
     const handleClearInventory = async (itemId: Id<"stagingArea">) => {
-        let success = false;
         try {
-            success = false;
             const res = await clear({ itemId })
 
             if (res) {
@@ -213,7 +211,7 @@ export const RequestsActions = ({ orgId, stagingAreaId, action, orderData, order
                     variant: "success",
                     title: "Success",
                 })
-                success = true;
+                router.push("/requests")
             } else {
                 toast({
                     description: "Failed to clear the item. Please try again.",
@@ -228,11 +226,7 @@ export const RequestsActions = ({ orgId, stagingAreaId, action, orderData, order
                 variant: "destructive",
                 title: "Error",
             })
-        } finally {
-            if (success) {
-                router.push("/requests")
-            }
-        }
+        } 
     }
     return (
         <>

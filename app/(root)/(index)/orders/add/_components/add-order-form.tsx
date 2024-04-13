@@ -1,14 +1,13 @@
 "use client";
 
 import { z } from "zod";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
 import { api } from "@/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 
 import {
     CircleCheck,
@@ -69,7 +68,7 @@ type AddInventoryFormProps = {
     isStaff: boolean;
 }
 
-export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps) => {
+export const AddOrderForm = ({ orgId: id, isAdmin, isStaff }: AddInventoryFormProps) => {
     const [chosenItem, setChosenItem] = useState("");
     const [disabled, setDisabled] = useState(false);
     const router = useRouter();
@@ -89,20 +88,18 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
             customer: "",
         }
     })
-    const isSubmitting = form.formState.isSubmitting;
 
-    const items = useQuery(api.inventories.getInventories, orgId ? { orgId } : "skip");
+    const isSubmitting = form.formState.isSubmitting;
+    const orgId = id ? id : "skip";
+    const items = useQuery(api.inventories.getInventories, { orgId });
     const isLoading = items === undefined;
 
     const itemNames = Array.from(new Set(items?.map((item) => ({ itemName: item.itemName, status: item.status }))));
 
-
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         const itemToUpdate = items?.find((item) => item.itemName === values.itemName && item.size === values.size && item.orgId === orgId);
         if (!orgId || !itemToUpdate) return;
-        let success = false;
         try {
-            success = false;
             if (isAdmin) {
                 const res = await addNewOrder({
                     orgId,
@@ -122,7 +119,7 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
                         description: "Order added successfully.",
                         variant: "success",
                     })
-                    success = true;
+                    router.push("/orders")
                 }
             } else if (isStaff) {
                 const res = await addToStagingArea({
@@ -149,7 +146,7 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
                         description: "Your request has been sent and is pending for approval",
                         variant: "default",
                     })
-                    success = true;
+                    router.push("/orders")
                 }
             } else {
                 return null;
@@ -163,19 +160,19 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
                 title: "Error",
             })
         } finally {
-
-            if (success) {
-                router.push("/orders")
-            }
             form.reset();
         }
     }
 
     const handleItemChange = (val: string) => {
         setChosenItem(val);
+        const itemStatus = itemNames.find((item) => item.itemName === val)?.status;
+        if (itemStatus === "Out Of Stock") {
+            setDisabled(true);
+        } else {
+            setDisabled(false);
+        }
     }
-
-    console.log(chosenItem)
 
     return (
         <Form {...form}>
@@ -190,7 +187,7 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
                             <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
                                 Add New Order
                             </h1>
-                            <OrderAddActionButtons form={form} isLoading={isSubmitting} largeScreen />
+                            <OrderAddActionButtons form={form} isLoading={isSubmitting} disabled={disabled} largeScreen />
                         </div>
                         {isLoading && <Loader text="Loading Order" />}
                         <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
@@ -242,7 +239,7 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
                                                         <FormItem>
                                                             <FormLabel>Customer Name</FormLabel>
                                                             <FormControl>
-                                                                <Input placeholder="Enter customer"  {...field} required />
+                                                                <Input disabled={disabled} placeholder="Enter customer"  {...field} required />
                                                             </FormControl>
                                                             <FormMessage />
                                                         </FormItem>
@@ -272,7 +269,7 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
                                                             render={({ field }) => (
                                                                 <FormItem>
                                                                     <FormControl>
-                                                                        <Input id="quantity" min="0" placeholder="99" type="number" {...field} />
+                                                                        <Input disabled={disabled} id="quantity" min="0" placeholder="99" type="number" {...field} />
                                                                     </FormControl>
                                                                     {items?.filter((item) => item.itemName === chosenItem).map((item, index) => (
                                                                         <FormDescription key={index} className="text-muted-foreground text-sm">
@@ -293,7 +290,7 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
                                                                     <FormControl>
                                                                         <div className="flex items-center gap-x-2">
                                                                             ₱
-                                                                            <Input id="price" step="0.01" type="number" {...field} />
+                                                                            <Input disabled={disabled} id="price" step="0.01" type="number" {...field} />
                                                                         </div>
 
                                                                     </FormControl>
@@ -323,7 +320,7 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
                                                                             <SelectGroup>
                                                                                 <SelectLabel>Available Sizes</SelectLabel>
                                                                                 {items?.filter(item => item.itemName === chosenItem).map((item, index) => (
-                                                                                    <SelectItem key={index} value={item.size} disabled={item.status === "Out Of Stock"}>{item.size}</SelectItem>
+                                                                                    <SelectItem  key={index} value={item.size} disabled={item.status === "Out Of Stock"}>{item.size}</SelectItem>
                                                                                 ))}
                                                                             </SelectGroup>
                                                                         </SelectContent>
@@ -373,7 +370,7 @@ export const AddOrderForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormProps)
                                 </Card>
                             </div>
                         </div>
-                        <OrderAddActionButtons form={form} isLoading={isSubmitting} smallScreen />
+                        <OrderAddActionButtons form={form} isLoading={isSubmitting} disabled={disabled} smallScreen />
                     </div>
                 </main>
             </form>

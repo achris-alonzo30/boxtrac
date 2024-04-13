@@ -5,25 +5,23 @@ import { useConvexAuth } from "convex/react";
 
 import {
   Card,
-  CardFooter,
   CardContent,
 } from "@/components/ui/card";
 import { Loader } from "@/components/loader";
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
-import { AddButton } from "@/components/add-buttons";
 import { CardHeaders } from "@/components/card-headers";
-import { FilterButton } from "@/components/filter-buttons";
 import { InventoryTable } from "./_components/table/inventory-table";
 
 const InventoryPage = () => {
   const { isAuthenticated, isLoading } = useConvexAuth();
 
-  if (isLoading) <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
-
   if (!isAuthenticated) {
     redirect("/");
   }
+
+  if (isLoading) <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
+
   
   return (
     <div className="flex h-full w-full flex-col bg-muted/40">

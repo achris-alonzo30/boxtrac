@@ -48,9 +48,8 @@ export const OrdersActions = ({ itemId }: {itemId: Id<"order">}) => {
     
     const handleSubmit = async (orderId: Id<"order">) => {
         if (!orgId || !orderId) return;
-        let success = false;
+
         try {
-            success = false;
             if (isAdmin) {
                 const res = await deleteOrder({
                     id: orderId
@@ -62,7 +61,7 @@ export const OrdersActions = ({ itemId }: {itemId: Id<"order">}) => {
                         description: "Item has been deleted",
                         variant: "default",
                     })
-                    success = true;
+                    router.push("/orders")
                 }
                 
             } else if (isStaff) {
@@ -81,7 +80,7 @@ export const OrdersActions = ({ itemId }: {itemId: Id<"order">}) => {
                         description: "Your request has been sent and is pending for approval",
                         variant: "default",
                     })
-                    success = true;
+                    router.push("/orders")
                 }
 
             } else {
@@ -96,9 +95,6 @@ export const OrdersActions = ({ itemId }: {itemId: Id<"order">}) => {
                 variant: "destructive",
             })
         } finally {
-            if (success) {
-                router.push("/orders")
-            }
             setIsConfirmOpen(false);
         }
     }

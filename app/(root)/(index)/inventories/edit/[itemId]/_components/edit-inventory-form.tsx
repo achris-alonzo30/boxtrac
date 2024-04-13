@@ -1,20 +1,15 @@
 "use client";
 
 import { z } from "zod";
-
-import { useForm } from "react-hook-form";
 import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-
-import {
-    Loader2,
-    ChevronLeft,
-} from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 
 import {
     Form,
@@ -24,13 +19,7 @@ import {
     FormControl,
     FormMessage,
 } from "@/components/ui/form";
-import {
-    Card,
-    CardTitle,
-    CardHeader,
-    CardContent,
-    CardDescription,
-} from "@/components/ui/card";
+
 import {
     Table,
     TableBody,
@@ -50,6 +39,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { CardHeaders } from "@/components/card-headers";
+import { Card, CardContent } from "@/components/ui/card";
 import { InventoryEditActionButtons } from "./inventory-edit-action-buttons";
 
 const formSchema = z.object({
@@ -79,14 +69,17 @@ export const EditInventoryForm = ({ itemId, orgId, isAdmin, isStaff }: EditInven
 
     useEffect(() => {
         // Update the form default values when 'item' changes
-        form.reset({
-            size: item?.size || '',
-            price: item?.price ? String(item.price) : '',
-            status: item?.status || '',
-            quantity: item?.quantity ? String(item.quantity) : '',
-            itemName: item?.itemName || '',
-            supplier: item?.supplier || '',
-        });
+        if (item) (
+            form.reset({
+                size: item?.size || '',
+                price: item?.price ? String(item.price) : '',
+                status: item?.status || '',
+                quantity: item?.quantity ? String(item.quantity) : '',
+                itemName: item?.itemName || '',
+                supplier: item?.supplier || '',
+            })
+        )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [item]);
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -105,9 +98,7 @@ export const EditInventoryForm = ({ itemId, orgId, isAdmin, isStaff }: EditInven
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         if (!orgId) return;
-        let success = false;
         try {
-            success = false;
             if (isAdmin) {
                 const res = await updateInventory({
                     id: itemId,
@@ -125,7 +116,7 @@ export const EditInventoryForm = ({ itemId, orgId, isAdmin, isStaff }: EditInven
                         variant: "success",
                         title: "Success",
                     })
-                    success = true;
+                    router.push("/inventories")
                 } else {
                     toast({
                         description: "Failed to update item. Please try again.",
@@ -158,7 +149,13 @@ export const EditInventoryForm = ({ itemId, orgId, isAdmin, isStaff }: EditInven
                         description: "Your request has been sent and is pending for approval",
                         variant: "default",
                     })
-                    success = true
+                    router.push("/inventories")
+                } else {
+                    toast({
+                        description: "Unable to send the request. Please try again.",
+                        variant: "destructive",
+                        title: "Error",
+                    })
                 }
             }
 
@@ -171,10 +168,6 @@ export const EditInventoryForm = ({ itemId, orgId, isAdmin, isStaff }: EditInven
             })
         } finally {
             form.reset();
-            if (success) {
-               router.push("/inventories") 
-            }
-            
         }
     }
     return (
@@ -330,7 +323,7 @@ export const EditInventoryForm = ({ itemId, orgId, isAdmin, isStaff }: EditInven
                                         </div>
                                     </CardContent>
                                 </Card>
-                                
+
                             </div>
                         </div>
                         <InventoryEditActionButtons form={form} isLoading={isLoading} smallScreen />

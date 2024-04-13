@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { redirect } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import {
@@ -15,13 +16,17 @@ import { SignInScreen } from "./_components/sign-in";
 const AuthPage = () => {
     const { orgRole, isSignedIn, isLoaded } = useAuth();
 
-    if (!isLoaded) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
+    useEffect(() => {
+        if (isSignedIn) {
+            if (orgRole === "org:admin") {
+                redirect("/dashboard");
+            } else if (orgRole === "org:member") {
+                redirect("/inventories");
+            }
+        }
+    }, [isSignedIn, orgRole]);
 
-    if (isSignedIn && orgRole === "org:admin") {
-        redirect("/dashboard");
-    } else if (isSignedIn && orgRole === "org:member") {
-        redirect("/inventories");
-    }
+    if (!isLoaded) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
     
     return (
         <div className="max-w-lg flex flex-col h-full items-center justify-center mx-auto my-8">

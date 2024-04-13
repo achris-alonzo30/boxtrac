@@ -1,10 +1,7 @@
-import {
-    Card,
-    CardFooter,
-    CardContent,
-  } from "@/components/ui/card";
+
 import { RequestsTable } from "./requests-table";
 import { CardHeaders } from "@/components/card-headers";
+import { Card, CardContent } from "@/components/ui/card";
 
 export const RequestsScreen = () => {
     return (
@@ -13,12 +10,6 @@ export const RequestsScreen = () => {
             <CardContent>
                 <RequestsTable />
             </CardContent>
-            <CardFooter>
-                <div className="text-xs text-muted-foreground">
-                    Showing <strong>1-10</strong> of <strong>32</strong>{" "}
-                    products
-                </div>
-            </CardFooter>
         </Card>
     )
 }

@@ -5,16 +5,8 @@ import { formatRelative } from "date-fns";
 import { ColumnDef } from "@tanstack/react-table";
 import { Doc } from "@/convex/_generated/dataModel";
 
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 
-import {
-    DropdownMenu,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-    DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { InventoryActions } from "./inventory-actions";

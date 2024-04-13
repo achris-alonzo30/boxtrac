@@ -2,77 +2,63 @@
 
 import { z } from "zod";
 import { useEffect } from "react";
-import { useAuth } from "@clerk/nextjs";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useMutation, useQuery } from "convex/react";
-import { redirect, useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import { ChevronLeft } from "lucide-react";
 
 import {
-  Loader2,
-  ChevronLeft,
-} from "lucide-react";
-
-import {
-  Form,
-  FormItem,
-  FormField,
-  FormLabel,
-  FormControl,
-  FormMessage,
+    Form,
+    FormItem,
+    FormField,
+    FormLabel,
+    FormControl,
+    FormMessage,
 } from "@/components/ui/form";
 import {
-  Card,
-  CardTitle,
-  CardHeader,
-  CardContent,
-  CardDescription,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableRow,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
 } from "@/components/ui/table";
 import {
-  Select,
-  SelectItem,
-  SelectValue,
-  SelectLabel,
-  SelectGroup,
-  SelectContent,
-  SelectTrigger,
+    Select,
+    SelectItem,
+    SelectValue,
+    SelectGroup,
+    SelectContent,
+    SelectTrigger,
 } from "@/components/ui/select";
-import { Header } from "@/components/header";
 import { Input } from "@/components/ui/input";
-import { Sidebar } from "@/components/sidebar";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { OrderEditActionButtons } from "./order-edit-action-button";
 import { CardHeaders } from "@/components/card-headers";
+import { Card, CardContent } from "@/components/ui/card";
+import { OrderEditActionButtons } from "./order-edit-action-button";
 
 const formSchema = z.object({
-  size: z.string().min(1),
-  price: z.string().min(1),
-  status: z.string().min(1),
-  itemName: z.string().min(1),
-  customer: z.string().min(1),
-  quantity: z.string().min(1),
+    size: z.string().min(1),
+    price: z.string().min(1),
+    status: z.string().min(1),
+    itemName: z.string().min(1),
+    customer: z.string().min(1),
+    quantity: z.string().min(1),
 })
 
 type OrderEditFormProps = {
-  orderId: Id<"order">,
-  orgId: string | null,
-  isAdmin: boolean,
-  isStaff: boolean,
+    orderId: Id<"order">,
+    orgId: string | null,
+    isAdmin: boolean,
+    isStaff: boolean,
 }
 
-export const OrderEditForm = ({ orderId, orgId, isAdmin, isStaff }: OrderEditFormProps) => {
+export const OrderEditForm = ({ orderId, orgId: id, isAdmin, isStaff }: OrderEditFormProps) => {
     const router = useRouter();
     const { toast } = useToast();
 
@@ -82,14 +68,17 @@ export const OrderEditForm = ({ orderId, orgId, isAdmin, isStaff }: OrderEditFor
 
     useEffect(() => {
         // Update the form default values when 'item' changes
-        form.reset({
-            size: order?.size || '',
-            price: order?.price ? String(order.price) : '',
-            status: order?.status || '',
-            quantity: order?.quantity ? String(order.quantity) : '',
-            itemName: order?.itemName || '',
-            customer: order?.customer || '',
-        });
+        if (order) {
+            form.reset({
+                size: order?.size || '',
+                price: order?.price ? String(order.price) : '',
+                status: order?.status || '',
+                quantity: order?.quantity ? String(order.quantity) : '',
+                itemName: order?.itemName || '',
+                customer: order?.customer || '',
+            })
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [order]);
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -105,14 +94,13 @@ export const OrderEditForm = ({ orderId, orgId, isAdmin, isStaff }: OrderEditFor
     })
 
     const isLoading = form.formState.isSubmitting;
-    const items = useQuery(api.inventories.getInventories, orgId ? { orgId } : "skip");
+    const orgId = id ? id : "skip";
+    const items = useQuery(api.inventories.getInventories, { orgId });
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         const itemToUpdate = items?.find((item) => item.itemName === values.itemName && item.size === values.size && item.orgId === orgId);
         if (!orgId || !order || !items || !itemToUpdate) return;
-        let success = false;
         try {
-            success = false;
             if (isAdmin) {
                 const res = await updateOrder({
                     id: orderId,
@@ -132,7 +120,7 @@ export const OrderEditForm = ({ orderId, orgId, isAdmin, isStaff }: OrderEditFor
                         variant: "success",
                         title: "Success",
                     })
-                    success = true;
+                    router.push("/orders");
                 } else {
                     toast({
                         description: "Failed to update order. Please try again.",
@@ -167,7 +155,13 @@ export const OrderEditForm = ({ orderId, orgId, isAdmin, isStaff }: OrderEditFor
                         description: "Your request has been sent and is pending for approval",
                         variant: "default",
                     })
-                    success = true;
+                    router.push("/orders");
+                } else {
+                    toast({
+                        description: "Unable to send request. Please try again.",
+                        variant: "destructive",
+                        title: "Error",
+                    })
                 }
             }
 
@@ -179,9 +173,6 @@ export const OrderEditForm = ({ orderId, orgId, isAdmin, isStaff }: OrderEditFor
                 title: "Error",
             })
         } finally {
-            if (success) {
-                router.push("/orders");
-            }
             form.reset();
         }
     }
@@ -198,7 +189,7 @@ export const OrderEditForm = ({ orderId, orgId, isAdmin, isStaff }: OrderEditFor
                             <h1 className="flex-1 shrink-0 whitespace-nowrap text-xl font-semibold tracking-tight sm:grow-0">
                                 Update Order
                             </h1>
-                            <OrderEditActionButtons isLoading={isLoading} form={form} largeScreen  />
+                            <OrderEditActionButtons isLoading={isLoading} form={form} largeScreen />
                         </div>
                         <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
                             <div className="grid auto-rows-max items-start gap-4 lg:col-span-2 lg:gap-8">

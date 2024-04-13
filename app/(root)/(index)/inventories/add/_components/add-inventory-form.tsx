@@ -80,9 +80,7 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         if (!orgId) return;
-        let success = false;
         try {
-            success = false;
             if (isAdmin) {
                 const res = await addInventory({
                     orgId,
@@ -100,7 +98,7 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
                         description: "Item added to inventory",
                         variant: "success",
                     })
-                    success = true;
+                    router.push("/inventories")
                 }
             } else if (isStaff) {
 
@@ -126,11 +124,9 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
                         description: "Your request has been sent and is pending for approval",
                         variant: "default",
                     })
-                    success = true;
+                    router.push("/inventories")
                 }
-            } else {
-                return null;
-            }
+            } 
 
         } catch (error) {
             console.error(JSON.stringify(error, null, 2));
@@ -141,9 +137,6 @@ export const AddInventoryForm = ({ orgId, isAdmin, isStaff }: AddInventoryFormPr
             })
         } finally {
             form.reset();
-            if (success) {
-                router.push("/inventories")
-            }
         }
     }
 

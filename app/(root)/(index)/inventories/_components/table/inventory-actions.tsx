@@ -46,9 +46,7 @@ export const InventoryActions = ({ itemId }: {itemId: Id<"inventory">;}) => {
     
     const handleSubmit = async (inventoryId: Id<"inventory">) => {
         if (!orgId || !inventoryId) return;
-        let success = false;
         try {
-            success = false;
             if (isAdmin) {
                 const res = await deleteInventory({
                     itemId: inventoryId
@@ -60,8 +58,8 @@ export const InventoryActions = ({ itemId }: {itemId: Id<"inventory">;}) => {
                         description: "Item has been deleted",
                         variant: "default",
                     })
-                    success = true;
                     setIsConfirmOpen(false);
+                    router.push("/inventories")
                 }
                 
             } else if (isStaff) {
@@ -80,10 +78,9 @@ export const InventoryActions = ({ itemId }: {itemId: Id<"inventory">;}) => {
                         description: "Your request has been sent and is pending for approval",
                         variant: "default",
                     })
-                    success = true;
                     setIsConfirmOpen(false);
+                    router.push("/inventories")
                 }
-
             } else {
                 return null;
             }
@@ -97,9 +94,6 @@ export const InventoryActions = ({ itemId }: {itemId: Id<"inventory">;}) => {
             })
         } finally {
             setIsConfirmOpen(false);
-            if (success){
-                router.push("/inventories")
-            }
         }
     }
 

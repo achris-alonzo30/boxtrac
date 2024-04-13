@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
 
+import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { UseFormReturn } from "react-hook-form";
 
@@ -18,9 +18,10 @@ type InventoryActionsProps = {
     }, any, undefined>;
     smallScreen?: boolean;
     largeScreen?: boolean;
+    disabled?: boolean;
 }
 
-export const OrderAddActionButtons = ({ isLoading, form, smallScreen, largeScreen }: InventoryActionsProps) => {
+export const OrderAddActionButtons = ({ isLoading, form, smallScreen, largeScreen, disabled }: InventoryActionsProps) => {
     const router = useRouter();
     return (
         <>
@@ -34,11 +35,11 @@ export const OrderAddActionButtons = ({ isLoading, form, smallScreen, largeScree
                             form.reset();
                             router.back();
                         }}
-                        disabled={isLoading}
+                        disabled={isLoading || disabled}
                     >
                         Cancel
                     </Button>
-                    <Button size="sm" disabled={isLoading} type="submit">
+                    <Button size="sm" disabled={isLoading || disabled} type="submit">
                         {isLoading ? (
                             <span className="flex items-center gap-x-2">
                                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -60,11 +61,11 @@ export const OrderAddActionButtons = ({ isLoading, form, smallScreen, largeScree
                             form.reset();
                             router.back();
                         }}
-                        disabled={isLoading}
+                        disabled={isLoading || disabled}
                     >
                         Cancel
                     </Button>
-                    <Button size="sm" disabled={isLoading} type="submit">
+                    <Button size="sm" disabled={isLoading || disabled} type="submit">
                         {isLoading ? (
                             <span className="flex items-center gap-x-2">
                                 <Loader2 className="h-4 w-4 animate-spin" />
