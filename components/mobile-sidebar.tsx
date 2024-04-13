@@ -1,11 +1,11 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
-
+import { useAuth, useClerk } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import {
     Link,
+    LogOut,
     Package,
-    LineChart,
     PanelLeft,
     LayoutGrid,
     ScrollText,
@@ -24,7 +24,14 @@ import { Button } from "@/components/ui/button";
 
 export const MobileSidebar = () => {
     const { orgRole } = useAuth();
+    const { signOut } = useClerk();
+    const router = useRouter();
     const isAdmin = orgRole === "org:admin";
+
+    const handleSignOut = () => {
+        signOut();
+        router.push("/")
+    }
     return (
         <Sheet>
             <SheetTrigger asChild>
@@ -81,13 +88,13 @@ export const MobileSidebar = () => {
                         </Link>
                     )}
 
-                    <Link
-                        href="#"
-                        className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+                    <div
+                        onClick={() => handleSignOut()}
+                        className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                     >
-                        <LineChart className="h-5 w-5" />
-                        Settings
-                    </Link>
+                        <LogOut className="h-5 w-5" />
+                        <span className="sr-only">Logout</span>
+                    </div>
                 </nav>
             </SheetContent>
         </Sheet>

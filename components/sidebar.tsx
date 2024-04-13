@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@clerk/nextjs";
-import { usePathname } from 'next/navigation';
+import { useClerk, useAuth } from "@clerk/nextjs";
+import { usePathname, useRouter } from 'next/navigation';
 
 import {
+    Power,
     Package,
-    Settings,
     ScrollText,
     LayoutGrid,
     ShoppingCart,
@@ -20,24 +20,30 @@ import { ActionTooltip } from "@/components/action-tooltip";
 
 export const Sidebar = () => {
     const pathname = usePathname();
+    const router = useRouter();
     const { orgRole } = useAuth();
+    const { signOut } = useClerk();
 
     const isAdmin = orgRole === "org:admin";
+    const handleSignOut = () => {
+        signOut();
+        router.push("/")
+    }
 
     return (
         <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r bg-background sm:flex">
             <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
                 <Logo />
-                { isAdmin &&
-                <ActionTooltip name="Dashboard">
-                    <Link
-                        href="/dashboard"
-                        className={cn("flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8", pathname === "/dashboard" && "bg-muted")}
-                    >
-                        <LayoutGrid className={cn("h-5 w-5", pathname === "/dashboard" && "text-[#2ca9bc]")} />
-                        <span className="sr-only">Dashboard</span>
-                    </Link>
-                </ActionTooltip>
+                {isAdmin &&
+                    <ActionTooltip name="Dashboard">
+                        <Link
+                            href="/dashboard"
+                            className={cn("flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8", pathname === "/dashboard" && "bg-muted")}
+                        >
+                            <LayoutGrid className={cn("h-5 w-5", pathname === "/dashboard" && "text-[#2ca9bc]")} />
+                            <span className="sr-only">Dashboard</span>
+                        </Link>
+                    </ActionTooltip>
                 }
                 <ActionTooltip name="Inventories">
                     <Link
@@ -57,7 +63,7 @@ export const Sidebar = () => {
                         <span className="sr-only">Orders</span>
                     </Link>
                 </ActionTooltip>
-                
+
                 {isAdmin && (
                     <ActionTooltip name="Requests">
                         <Link
@@ -83,14 +89,14 @@ export const Sidebar = () => {
                 )}
             </nav>
             <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
-                <ActionTooltip name="Settings">
-                    <Link
-                        href="#"
+                <ActionTooltip name="Logout">
+                    <div
+                        onClick={() => handleSignOut()}
                         className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
                     >
-                        <Settings className="h-5 w-5" />
-                        <span className="sr-only">Settings</span>
-                    </Link>
+                        <Power className="h-5 w-5" />
+                        <span className="sr-only">Logout</span>
+                    </div>
                 </ActionTooltip>
             </nav>
         </aside >

@@ -21,7 +21,6 @@ const RequestsPage = () => {
 
   if (!isLoaded) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
 
-
   return (
     <div className="flex h-full w-full flex-col bg-muted/40">
       <Sidebar />

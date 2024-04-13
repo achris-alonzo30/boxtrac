@@ -47,6 +47,8 @@ const DashboardPage = () => {
             if (orgRole !== "org:admin") {
                 redirect("/inventories");
             }
+        } else {
+            redirect("/");
         }
     }, [isSignedIn, orgRole]);
 

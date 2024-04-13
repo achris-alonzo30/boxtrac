@@ -106,7 +106,7 @@ export const columns: ColumnDef<Doc<"order">>[] = [
         header: "Status",
         cell: ({ row }) => {
             const status = row.getValue("status") as string;
-            const variant = status === "In Stock" ? "default" : status === "Low Stock" ? "secondary" : status === "Out Of Stock" ? "destructive" : "default";
+            const variant = status === "Fulfilled" ? "default" : status === "Pending" ? "secondary" : status === "Refunded" ? "neutral" : status === "Cancelled" ? "destructive" : "default";
             return <Badge variant={variant}>{status}</Badge>;
         }
     },

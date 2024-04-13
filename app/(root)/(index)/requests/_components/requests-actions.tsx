@@ -6,19 +6,10 @@ import { useMutation } from "convex/react";
 import { useRouter } from "next/navigation";
 import { api } from "@/convex/_generated/api";
 import { inventoryData, orderData } from "./types";
+import { Id } from "@/convex/_generated/dataModel";
 
 import { MoreHorizontal } from "lucide-react"
 
-import {
-    AlertDialog,
-    AlertDialogTitle,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogContent,
-    AlertDialogDescription,
-} from "@/components/ui/alert-dialog";
 import {
     DropdownMenu,
     DropdownMenuItem,
@@ -27,8 +18,11 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Id } from "@/convex/_generated/dataModel";
+import { Dialog } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
+import { ClearDialog } from "./dialogs/clear-dialog";
+import { ViewOrderDialog } from "./dialogs/view-order-dialog";
+import { ViewInventoryDialog } from "./dialogs/view-inventory-dialog";
 
 type RequestsActionsProps = {
     orgId: string;
@@ -40,16 +34,17 @@ type RequestsActionsProps = {
     inventoryId?: Id<"inventory"> | undefined;
 }
 
-export const RequestsActions = ({ 
-    orgId, 
-    stagingAreaId, 
-    action, 
-    orderData, 
-    orderId, 
-    inventoryData, 
-    inventoryId 
+export const RequestsActions = ({
+    orgId,
+    stagingAreaId,
+    action,
+    orderData,
+    orderId,
+    inventoryData,
+    inventoryId
 }: RequestsActionsProps) => {
     const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+    const [isViewOpen, setIsViewOpen] = useState(false);
     const router = useRouter();
     const { toast } = useToast();
 
@@ -65,7 +60,7 @@ export const RequestsActions = ({
 
     // Staging Area Actions
     const clear = useMutation(api.stagingArea.clear);
- 
+
     const handleAcceptRequests = async (
         inventoryData: inventoryData,
         orderData: orderData,
@@ -88,7 +83,7 @@ export const RequestsActions = ({
                         variant: "success",
                         title: "Success",
                     })
-                    clear({ itemId });  
+                    clear({ itemId });
                     router.push("/inventories")
                 } else {
                     toast({
@@ -199,56 +194,37 @@ export const RequestsActions = ({
                 variant: "destructive",
                 title: "Error",
             })
-        } 
+        }
     }
-    const handleClearInventory = async (itemId: Id<"stagingArea">) => {
-        try {
-            const res = await clear({ itemId })
 
-            if (res) {
-                toast({
-                    description: "Item cleared successfully.",
-                    variant: "success",
-                    title: "Success",
-                })
-                router.push("/requests")
-            } else {
-                toast({
-                    description: "Failed to clear the item. Please try again.",
-                    variant: "destructive",
-                    title: "Error",
-                })
-            }
-        } catch (error) {
-            console.error(JSON.stringify(error, null, 2));
-            toast({
-                description: "Failed to clear the item. Please try again.",
-                variant: "destructive",
-                title: "Error",
-            })
-        } 
-    }
     return (
         <>
-            <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Make sure you have carefully reviewed the request?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action cannot be undone and this will permanently delete the request.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel className="transform hover:-translate-y-1 transition-all duration-400" onClick={() => setIsConfirmOpen(false)}>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                            onClick={() => handleClearInventory(stagingAreaId)}
-                            className="transform hover:-translate-y-1 transition-all duration-400"
-                        >
-                            Continue
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <ClearDialog isConfirmOpen={isConfirmOpen} setIsConfirmOpen={setIsConfirmOpen} stagingAreaId={stagingAreaId} />
+
+            <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
+                {/* INVENTORY ACTIONS */}
+                {action === "[STAFF] Add New Item in Inventory" && inventoryData && (
+                    <ViewInventoryDialog inventoryData={inventoryData} action={"create"} />
+                )} 
+                {action === "[STAFF] Delete Inventory" && inventoryData && (
+                    <ViewInventoryDialog inventoryData={inventoryData} action={"create"} />
+                )}
+                {action === "[STAFF] Update Item in Inventory" && inventoryData && (
+                    <ViewInventoryDialog inventoryData={inventoryData} action={"create"} />
+                )}
+
+                {/* Order ACTIONS */}
+                {action === "[STAFF] Create New Order" && orderData && (
+                    <ViewOrderDialog orderData={orderData} action={"create"} />
+                )}
+                {action === "[STAFF] Update Order" && orderData  && (
+                    <ViewOrderDialog orderData={orderData} action={"update"} />
+                )}
+                {action === "[STAFF] Delete Order" && orderData && (
+                    <ViewOrderDialog orderData={orderData} action={"delete"} />
+                )}
+
+            </Dialog>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button
@@ -262,18 +238,18 @@ export const RequestsActions = ({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem>View</DropdownMenuItem>
-                    <DropdownMenuItem 
-                        onClick={() => 
+                    <DropdownMenuItem onClick={() => setIsViewOpen(true)}>View</DropdownMenuItem>
+                    <DropdownMenuItem
+                        onClick={() =>
                             handleAcceptRequests(
-                                inventoryData, 
-                                orderData, 
-                                stagingAreaId, 
-                                inventoryId!, 
-                                orderId!, 
+                                inventoryData,
+                                orderData,
+                                stagingAreaId,
+                                inventoryId!,
+                                orderId!,
                                 action)
-                            }
-                        >
+                        }
+                    >
                         Accept
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setIsConfirmOpen(true)}>Deny</DropdownMenuItem>
