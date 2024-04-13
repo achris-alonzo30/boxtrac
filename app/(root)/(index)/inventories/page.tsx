@@ -1,7 +1,8 @@
 "use client";
 
-import { redirect } from "next/navigation";
+import { useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
 
 import {
   Card,
@@ -14,16 +15,19 @@ import { CardHeaders } from "@/components/card-headers";
 import { InventoryTable } from "./_components/table/inventory-table";
 
 const InventoryPage = () => {
-  const { isSignedIn, isLoaded, orgRole } = useAuth();
+  const { isSignedIn, isLoaded, orgRole, orgId } = useAuth();
 
-  if (!isSignedIn) {
-    redirect("/");
-  }
-
-  if (!isLoaded) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
-
-  const isAdmin = orgRole === "org:admin";
+  useEffect(() => {
+    if (!isSignedIn) {
+      redirect("/");
+    }
+  }, [isSignedIn]);
   
+  if (!isLoaded) return <div className="flex min-h-screen items-center justify-center"><Loader text="Loading..." /></div>;
+
+  const id = orgId ? orgId : "skip"
+  const isAdmin = orgRole === "org:admin";
+
   return (
     <div className="flex h-full w-full flex-col bg-muted/40">
       <Sidebar isAdmin={isAdmin} />
@@ -33,7 +37,7 @@ const InventoryPage = () => {
           <Card>
               <CardHeaders title="Inventory" description="Manage and keep track of your inventory."/>
               <CardContent>
-                <InventoryTable />
+                <InventoryTable orgId={id} />
               </CardContent>
           </Card>
         </main>

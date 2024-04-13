@@ -3,7 +3,6 @@
 
 import Image from "next/image";
 import { useQuery } from "convex/react";
-import { useAuth } from "@clerk/nextjs";
 import { formatRelative } from "date-fns";
 import { api } from "@/convex/_generated/api";
 import { transformStockText } from "@/lib/utils";
@@ -21,12 +20,8 @@ import { RequestsActions } from "./requests-actions";
 import { RequestsTableHeads } from "./requests-table-heads";
 
 
-export const RequestsTable = () => {
-  const { orgId } = useAuth();
-
-  const org = orgId ? orgId : "skip";
-
-  const items = useQuery(api.stagingArea.getItemsInStagingArea, { orgId: org });
+export const RequestsTable = ({ orgId }: { orgId: string }) => {
+  const items = useQuery(api.stagingArea.getItemsInStagingArea, { orgId });
 
   const isLoading = items === undefined;
 
@@ -46,7 +41,7 @@ export const RequestsTable = () => {
                   <TableCell><Badge variant="default">{transformStockText(item.action)}</Badge></TableCell>
                   <TableCell>
                     <RequestsActions 
-                      orgId={org} 
+                      orgId={orgId} 
                       action={item.action} 
                       orderId={item.orderId} 
                       stagingAreaId={item._id} 

@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PerformanceCard } from "./admin-only/performance-card";
 
 
-export const Browser = ({ isAdmin }: { isAdmin: boolean; }) => {
+export const Browser = ({ isAdmin, orgId }: { isAdmin: boolean; orgId: string; }) => {
 
     return (
         <div className="flex h-full w-full flex-col bg-muted/40">
@@ -22,7 +22,7 @@ export const Browser = ({ isAdmin }: { isAdmin: boolean; }) => {
                             <Card>
                                 <CardHeaders title="Orders" description="View and manage your orders." />
                                 <CardContent>
-                                    <OrdersTable />
+                                    <OrdersTable orgId={orgId} />
                                 </CardContent>
                             </Card>
                         </div>

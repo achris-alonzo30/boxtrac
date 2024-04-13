@@ -14,7 +14,7 @@ import { SignUpScreen } from "./_components/sign-up";
 import { SignInScreen } from "./_components/sign-in";
 
 const AuthPage = () => {
-    const { orgRole, isSignedIn } = useAuth();
+    const { orgRole, isSignedIn, isLoaded } = useAuth();
 
     useEffect(() => {
         if (isSignedIn) {
@@ -25,10 +25,12 @@ const AuthPage = () => {
             }
         }
     }, [isSignedIn, orgRole]);
+
+    if (!isLoaded) return <div className="flex min-h-screen items-center justify-center"><Loader text="Loading..." /></div>;
     
     return (
-        <div className="max-w-lg flex flex-col h-full items-center justify-center mx-auto my-8">
-            <Tabs defaultValue="sign-in" className="max-w-lg">
+        <div className="max-w-lg flex flex-col min-h-screen items-center justify-center mx-auto">
+            <Tabs defaultValue="sign-in" className="max-w-lg ">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="sign-in">Sign In</TabsTrigger>
                     <TabsTrigger value="sign-up">Sign Up</TabsTrigger>

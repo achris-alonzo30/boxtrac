@@ -43,17 +43,16 @@ const DashboardPage = () => {
     const { isSignedIn, isLoaded, orgRole } = useAuth();
 
     useEffect(() => {
-        if (isSignedIn) {
-            if (orgRole !== "org:admin") {
-                redirect("/inventories");
-            }
-        } else {
+        if (!isSignedIn) {
             redirect("/");
+        } else if (isSignedIn && orgRole !== "org:admin") {
+            redirect("/inventories");
         }
     }, [isSignedIn, orgRole]);
 
-    if (!isLoaded) return <div className="flex h-screen items-center justify-center"><Loader text="Loading..." /></div>;
+    if (!isLoaded) return <div className="flex min-h-screen items-center justify-center"><Loader text="Loading..." /></div>;
     const isAdmin = orgRole === "org:admin";
+    
     return (
         <div className="flex h-full w-full flex-col bg-muted/40">
             <Sidebar isAdmin={isAdmin} />

@@ -59,7 +59,6 @@ type EditInventoryFormProps = {
 }
 
 export const EditInventoryForm = ({ itemId, orgId, isAdmin, isStaff }: EditInventoryFormProps) => {
-
     const router = useRouter();
     const { toast } = useToast();
 

@@ -67,8 +67,8 @@ export const SignInScreen = () => {
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2));
       toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
+        title: "Something Went Wrong",
+        description: "Make sure you've entered a correct details. Please try again.",
         variant: "destructive",
       })
     } finally {

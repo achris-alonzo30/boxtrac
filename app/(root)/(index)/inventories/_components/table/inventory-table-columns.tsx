@@ -1,6 +1,3 @@
-"use client"
-
-import { useAuth } from "@clerk/nextjs";
 import { formatRelative } from "date-fns";
 import { ColumnDef } from "@tanstack/react-table";
 import { Doc } from "@/convex/_generated/dataModel";
@@ -10,14 +7,6 @@ import { ArrowUpDown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { InventoryActions } from "./inventory-actions";
-
-export const useAuthDetails = () => {
-    const { orgId, orgRole } = useAuth();
-    if (!orgId) return;
-    const isAdmin = orgRole === "org:admin";
-    const isStaff = orgRole === "org:member";
-    return { orgId, isAdmin, isStaff };
-}
 
 
 export const columns: ColumnDef<Doc<"inventory">>[] = [

@@ -26,7 +26,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <main className="h-full">
+            <main className="bg-muted/40">
               {children}
             </main>
             <Toaster />

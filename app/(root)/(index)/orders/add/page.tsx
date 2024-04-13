@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 
@@ -10,8 +11,13 @@ import { AddOrderForm } from "./_components/add-order-form";
 const AddOrderPage = () => {
   const { orgRole, orgId, isSignedIn } = useAuth();
 
-  if (!isSignedIn) redirect("/");
+  useEffect(() => {
+    if (!isSignedIn) {
+      redirect("/");
+    }
+  }, [isSignedIn]);
 
+  const id = orgId ? orgId : "skip"
   const isAdmin = orgRole === "org:admin";
   const isStaff = orgRole === "org:member"
 
@@ -20,7 +26,7 @@ const AddOrderPage = () => {
       <Sidebar isAdmin={isAdmin} />
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
         <Header isAdmin={isAdmin} />
-        <AddOrderForm orgId={orgId} isAdmin={isAdmin} isStaff={isStaff} />
+        <AddOrderForm orgId={id} isAdmin={isAdmin} isStaff={isStaff} />
       </div>
     </div >
   )
