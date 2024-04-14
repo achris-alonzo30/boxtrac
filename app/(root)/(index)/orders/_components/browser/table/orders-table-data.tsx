@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image";
 import { useState } from "react";
 import { ListFilterIcon } from "lucide-react";
 import {
@@ -144,6 +145,7 @@ export function OrdersDataTable<TData, TValue>({
                             ))
                         ) : (
                             <TableRow>
+                                <Image src="/no-data.svg" alt="No Data" width={100} height={100} />
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
                                     No Orders.
                                 </TableCell>

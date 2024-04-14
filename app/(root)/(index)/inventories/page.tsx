@@ -29,7 +29,7 @@ const InventoryPage = () => {
   const isAdmin = orgRole === "org:admin";
 
   return (
-    <div className="flex h-full w-full flex-col bg-muted/40">
+    <div className="flex min-h-screen w-full flex-col bg-muted/30">
       <Sidebar isAdmin={isAdmin} />
       <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
         <Header isAdmin={isAdmin} />

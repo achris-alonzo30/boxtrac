@@ -71,10 +71,10 @@ export function InventoryDataTable<TData, TValue>({
         <div>
             <div className="flex items-center py-4">
                 <Input
-                    placeholder="Search product..."
-                    value={(table.getColumn("itemName")?.getFilterValue() as string) ?? ""}
+                    placeholder="Search action..."
+                    value={(table.getColumn("action")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("itemName")?.setFilterValue(event.target.value)
+                        table.getColumn("action")?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
                 />
@@ -147,7 +147,7 @@ export function InventoryDataTable<TData, TValue>({
                             <TableRow>
                                 <Image src="/no-data.svg" alt="No Data" width={100} height={100} />
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No Inventory.
+                                    No Logs.
                                 </TableCell>
                             </TableRow>
                         )}

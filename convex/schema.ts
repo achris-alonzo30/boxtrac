@@ -99,8 +99,12 @@ export default defineSchema({
   logs: defineTable({
     orgId: v.string(),
     action: v.string(),
-    item: item,
-  }),
+    data: v.object({
+      dataType: dataType,
+      orderData: orderData,
+      inventoryData: inventoryData,
+    }),
+  }).index("byOrgId", ["orgId"]),
 
   stagingArea: defineTable({
     orgId: v.string(),

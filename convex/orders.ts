@@ -20,6 +20,7 @@ export const addNewOrder = mutation({
     quantity: v.number(),
     supplier: v.string(),
     inventoryId: v.id("inventory"),
+    isStaff: v.optional(v.boolean()),
   },
   handler: async (
     ctx,
@@ -28,6 +29,7 @@ export const addNewOrder = mutation({
       price,
       orgId,
       status,
+      isStaff,
       customer,
       itemName,
       quantity,
@@ -66,6 +68,22 @@ export const addNewOrder = mutation({
     }
 
     if (res) {
+      if (isStaff) {
+        await ctx.scheduler.runAfter(0, internal.logs.createLog, {
+          action: "[STAFF]: Request to Add an Order",
+          orderId: res,
+          dataType: "Order",
+          orgId,
+        })
+      } else {
+        await ctx.scheduler.runAfter(0, internal.logs.createLog, {
+          action: "[ADMIN]: Create New Order",
+          orderId: res,
+          dataType: "Order",
+          orgId,
+        })
+      }
+      
       return { status: "complete" };
     }
   },
@@ -77,6 +95,7 @@ export const updateOrder = mutation({
     size: v.optional(v.string()),
     price: v.optional(v.number()),
     status: v.optional(v.string()),
+    isStaff: v.optional(v.boolean()),
     customer: v.optional(v.string()),
     itemName: v.optional(v.string()),
     quantity: v.optional(v.number()),
@@ -85,7 +104,7 @@ export const updateOrder = mutation({
   },
   handler: async (
     ctx, 
-    { id, size, price, status, customer, itemName, quantity, supplier, inventoryId }
+    { id, size, price, status, customer, itemName, quantity, supplier, inventoryId, isStaff }
   ) => {
     const order = await orderDataAccess(id, ctx);
     
@@ -108,11 +127,27 @@ export const updateOrder = mutation({
 
       if (inventoryId && (refunded || fulfilled)) {
         await ctx.scheduler.runAfter(0, internal.inventories.updateItemQuantity, {
-        refunded,
-        fulfilled,
-        inventoryId,
-        stateQuantity: quantity ? quantity : 0,
-      })
+          refunded,
+          fulfilled,
+          inventoryId,
+          stateQuantity: quantity ? quantity : 0,
+        })
+      }
+
+      if (isStaff) {
+        await ctx.scheduler.runAfter(0, internal.logs.createLog, {
+          action: "[STAFF]: Request to Update Order",
+          orderId: id,
+          dataType: "Order",
+          orgId: order.order.orgId
+        })
+      } else {
+        await ctx.scheduler.runAfter(0, internal.logs.createLog, {
+          action: "[ADMIN]: Update Order",
+          orderId: id,
+          dataType: "Order",
+          orgId: order.order.orgId
+        })
       }
     
       return { success: true}
@@ -128,14 +163,31 @@ export const updateOrder = mutation({
 export const deleteOrder = mutation({
   args: {
     id: v.id("order"),
+    isStaff: v.optional(v.boolean()),
   },
-  handler: async (ctx, { id }) => {
+  handler: async (ctx, { id, isStaff }) => {
     const order = await orderDataAccess(id, ctx);
 
     if (!order) throw new ConvexError("[DELETE_ORDER]: Order not found");
 
     try {
       await ctx.db.delete(order.order._id);
+
+      if (isStaff) {
+        await ctx.scheduler.runAfter(0, internal.logs.createLog, {
+          action: "[STAFF]: Request to Delete Order",
+          orderId: id,
+          dataType: "Order",
+          orgId: order.order.orgId
+        })
+      } else {
+        await ctx.scheduler.runAfter(0, internal.logs.createLog, {
+          action: "[ADMIN]: Delete Order",
+          orderId: id,
+          dataType: "Order",
+          orgId: order.order.orgId
+        })
+      }
 
       return { success: true}
     } catch (error) {

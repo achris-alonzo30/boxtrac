@@ -16,10 +16,11 @@ export const addItemToInventory = mutation({
     itemName: v.string(),
     quantity: v.number(),
     supplier: v.string(),
+    isStaff: v.optional(v.boolean()),
   },
   handler: async (
     ctx,
-    { size, orgId, price, status, itemName, quantity, supplier }
+    { size, orgId, price, status, itemName, quantity, supplier, isStaff }
   ) => {
     
     const hasAccess = await orgAccess(orgId, ctx);
@@ -38,12 +39,21 @@ export const addItemToInventory = mutation({
     });
 
     if (inventoryId) {
-      await ctx.scheduler.runAfter(0, internal.logs.createLog, {
-        orgId,
-        action: "Add New Item in Inventory",
-        inventoryId,
-      })
-
+      if (isStaff) {
+        await ctx.scheduler.runAfter(0, internal.logs.createLog, {
+          action: "[STAFF]: Request to Add an Item in Inventory",
+          inventoryId,
+          dataType: "Inventory",
+          orgId,
+        })
+      } else {
+        await ctx.scheduler.runAfter(0, internal.logs.createLog, {
+          action: "[ADMIN]: Added a New Item in Inventory",
+          inventoryId,
+          dataType: "Inventory",
+          orgId,
+        })
+      }
       return { status: "complete"}
     } 
 
@@ -59,15 +69,16 @@ export const updateItemToInventory = mutation({
     itemName: v.optional(v.string()),
     quantity: v.optional(v.number()),
     supplier: v.optional(v.string()),
+    isStaff: v.optional(v.boolean()),
   },
   handler: async (
     ctx,
-    { id, size, price, status, itemName, quantity, supplier }
+    { id, size, price, status, itemName, quantity, supplier, isStaff }
   ) => {
     const item = await inventoryAccess(id, ctx);
 
     if (!item) throw new ConvexError("[UPDATE_INVENTORY]: Inventory not found");
-    
+
     try {
       await ctx.db.patch(item.item._id, {
         size,
@@ -77,6 +88,22 @@ export const updateItemToInventory = mutation({
         quantity,
         supplier,
       });
+
+      if (isStaff) {
+        await ctx.scheduler.runAfter(0, internal.logs.createLog, {
+          action: "[STAFF]: Request for Update an Item in Inventory",
+          inventoryId: id,
+          dataType: "Inventory",
+          orgId: item.item.orgId
+        })
+      } else {
+        await ctx.scheduler.runAfter(0, internal.logs.createLog, {
+          action: "[ADMIN]: Updated an Item in Inventory",
+          inventoryId: id,
+          dataType: "Inventory",
+          orgId: item.item.orgId
+        })
+      }
       return { success: true}
     } catch(error) {
       console.error(JSON.stringify(error, null, 2));
@@ -88,14 +115,33 @@ export const updateItemToInventory = mutation({
 export const deleteItemToInventory = mutation({
   args: {
     itemId: v.id("inventory"),
+    isStaff: v.optional(v.boolean()),
   },
-  handler: async (ctx, { itemId }) => {
+  handler: async (ctx, { itemId, isStaff }) => {
     const item = await inventoryAccess(itemId, ctx);
 
     if (!item) throw new ConvexError("[DELETE_INVENTORY]: Inventory not found");
 
     try {
       await ctx.db.delete(item.item._id);
+
+      
+
+      if (isStaff) {
+        await ctx.scheduler.runAfter(0, internal.logs.createLog, {
+          action: "[STAFF]: Request to Delete an Item in Inventory",
+          inventoryId: itemId,
+          dataType: "Inventory",
+          orgId: item.item.orgId
+        })
+      } else {
+        await ctx.scheduler.runAfter(0, internal.logs.createLog, {
+          action: "[ADMIN]: Deleted an Item in Inventory",
+          inventoryId: itemId,
+          dataType: "Inventory",
+          orgId: item.item.orgId
+        })
+      }
 
       return { success: true};
     } catch (error) {

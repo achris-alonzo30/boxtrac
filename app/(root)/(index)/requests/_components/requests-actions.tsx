@@ -75,6 +75,7 @@ export const RequestsActions = ({
                 const res = await addInventory({
                     ...inventoryData,
                     orgId,
+                    isStaff: true
                 })
 
                 if (res) {
@@ -97,6 +98,7 @@ export const RequestsActions = ({
             if (inventoryId && action === "[STAFF] Delete Inventory") {
                 const res = await deleteInventory({
                     itemId: inventoryId,
+                    isStaff: true
                 })
 
                 if (res.success === true) {
@@ -120,6 +122,7 @@ export const RequestsActions = ({
                 const res = await updateInventory({
                     id: inventoryId,
                     ...inventoryData,
+                    isStaff: true
                 })
 
                 if (res.success === true) {
@@ -143,7 +146,8 @@ export const RequestsActions = ({
                 const res = await addNewOrder({
                     ...orderData,
                     inventoryId,
-                    orgId
+                    orgId,
+                    isStaff: true
                 })
 
                 if (res) {
@@ -161,6 +165,7 @@ export const RequestsActions = ({
                     id: orderId,
                     ...orderData,
                     inventoryId,
+                    isStaff: true
                 })
 
                 if (res?.success === true) {
@@ -175,7 +180,7 @@ export const RequestsActions = ({
             }
 
             if (orderId && action === "[STAFF] Delete Order") {
-                const res = await deleteOrder({ id: orderId })
+                const res = await deleteOrder({ id: orderId, isStaff: true })
                 if (res?.success === true) {
                     toast({
                         description: "Order deleted successfully.",
