@@ -10,19 +10,6 @@ export const dataType = v.optional(
   v.union(v.literal("Inventory"), v.literal("Order"))
 );
 
-export const item = v.object({
-  _id: v.id("inventory"),
-  _creationTime: v.number(),
-  orgId: v.string(),
-  size: v.string(),
-  price: v.number(),
-  status: v.string(),
-  itemName: v.string(),
-  quantity: v.number(),
-  supplier: v.string(),
-  requestForEdit: v.optional(v.boolean()),
-  requestForDeletion: v.optional(v.boolean()),
-});
 
 export const inventoryData = v.optional(
   v.object({
@@ -32,8 +19,6 @@ export const inventoryData = v.optional(
     itemName: v.string(),
     quantity: v.number(),
     supplier: v.string(),
-    requestForEdit: v.optional(v.boolean()),
-    requestForDeletion: v.optional(v.boolean()),
   })
 );
 
@@ -46,8 +31,6 @@ export const orderData = v.optional(
     itemName: v.string(),
     quantity: v.number(),
     supplier: v.string(),
-    requestForEdit: v.optional(v.boolean()),
-    requestForDeletion: v.optional(v.boolean()),
   })
 );
 
@@ -73,12 +56,9 @@ export default defineSchema({
     itemName: v.string(),
     quantity: v.number(),
     supplier: v.string(),
-    requestForEdit: v.optional(v.boolean()),
-    requestForDeletion: v.optional(v.boolean()),
+    orderCount: v.optional(v.number()),
   })
-    .index("byOrgId", ["orgId"])
-    .index("byMarkedForDeletion", ["requestForDeletion"])
-    .index("byMarkedForEdit", ["requestForEdit"]),
+    .index("byOrgId", ["orgId"]),
 
   order: defineTable({
     size: v.string(),
@@ -89,12 +69,8 @@ export default defineSchema({
     itemName: v.string(),
     quantity: v.number(),
     supplier: v.string(),
-    requestForEdit: v.optional(v.boolean()),
-    requestForDeletion: v.optional(v.boolean()),
   })
-    .index("byOrgId", ["orgId"])
-    .index("byMarkedForDeletion", ["requestForDeletion"])
-    .index("byMarkedForEdit", ["requestForEdit"]),
+    .index("byOrgId", ["orgId"]),
 
   logs: defineTable({
     orgId: v.string(),

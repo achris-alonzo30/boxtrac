@@ -1,6 +1,4 @@
 export type inventoryData = {
-    requestForEdit?: boolean | undefined;
-    requestForDeletion?: boolean | undefined;
     size: string;
     price: number;
     status: string;
@@ -10,8 +8,6 @@ export type inventoryData = {
 } | undefined
 
 export type orderData = {
-    requestForEdit?: boolean | undefined;
-    requestForDeletion?: boolean | undefined;
     size: string;
     price: number;
     status: string;

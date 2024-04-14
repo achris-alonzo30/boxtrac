@@ -9,8 +9,6 @@ export const CardHeaders = ({ title, description }: { title: string; description
         <CardHeader >
             <CardTitle>{title}</CardTitle>
             <CardDescription>{description}</CardDescription>
-
-            
         </CardHeader>
 
     );

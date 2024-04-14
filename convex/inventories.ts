@@ -1,5 +1,11 @@
 import { ConvexError, v } from "convex/values";
-import { MutationCtx, QueryCtx, internalMutation, mutation, query } from "./_generated/server";
+import {
+  MutationCtx,
+  QueryCtx,
+  internalMutation,
+  mutation,
+  query,
+} from "./_generated/server";
 import { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 
@@ -22,11 +28,12 @@ export const addItemToInventory = mutation({
     ctx,
     { size, orgId, price, status, itemName, quantity, supplier, isStaff }
   ) => {
-    
     const hasAccess = await orgAccess(orgId, ctx);
 
     if (!hasAccess)
-      throw new ConvexError("[ADD_INVENTORY] You do not have access to this organization");
+      throw new ConvexError(
+        "[ADD_INVENTORY] You do not have access to this organization"
+      );
 
     const inventoryId = await ctx.db.insert("inventory", {
       size,
@@ -45,18 +52,17 @@ export const addItemToInventory = mutation({
           inventoryId,
           dataType: "Inventory",
           orgId,
-        })
+        });
       } else {
         await ctx.scheduler.runAfter(0, internal.logs.createLog, {
           action: "[ADMIN]: Added a New Item in Inventory",
           inventoryId,
           dataType: "Inventory",
           orgId,
-        })
+        });
       }
-      return { status: "complete"}
-    } 
-
+      return { status: "complete" };
+    }
   },
 });
 
@@ -94,20 +100,20 @@ export const updateItemToInventory = mutation({
           action: "[STAFF]: Request for Update an Item in Inventory",
           inventoryId: id,
           dataType: "Inventory",
-          orgId: item.item.orgId
-        })
+          orgId: item.item.orgId,
+        });
       } else {
         await ctx.scheduler.runAfter(0, internal.logs.createLog, {
           action: "[ADMIN]: Updated an Item in Inventory",
           inventoryId: id,
           dataType: "Inventory",
-          orgId: item.item.orgId
-        })
+          orgId: item.item.orgId,
+        });
       }
-      return { success: true}
-    } catch(error) {
+      return { success: true };
+    } catch (error) {
       console.error(JSON.stringify(error, null, 2));
-      return { success: false}
+      return { success: false };
     }
   },
 });
@@ -125,31 +131,28 @@ export const deleteItemToInventory = mutation({
     try {
       await ctx.db.delete(item.item._id);
 
-      
-
       if (isStaff) {
         await ctx.scheduler.runAfter(0, internal.logs.createLog, {
           action: "[STAFF]: Request to Delete an Item in Inventory",
           inventoryId: itemId,
           dataType: "Inventory",
-          orgId: item.item.orgId
-        })
+          orgId: item.item.orgId,
+        });
       } else {
         await ctx.scheduler.runAfter(0, internal.logs.createLog, {
           action: "[ADMIN]: Deleted an Item in Inventory",
           inventoryId: itemId,
           dataType: "Inventory",
-          orgId: item.item.orgId
-        })
+          orgId: item.item.orgId,
+        });
       }
 
-      return { success: true};
+      return { success: true };
     } catch (error) {
       console.error(JSON.stringify(error, null, 2));
-      return { success: false}
+      return { success: false };
     }
-
-  }
+  },
 });
 
 export const updateItemQuantity = internalMutation({
@@ -159,33 +162,33 @@ export const updateItemQuantity = internalMutation({
     refunded: v.boolean(),
     fulfilled: v.boolean(),
   },
-  handler: async (ctx, { inventoryId, stateQuantity, refunded, fulfilled } ) => {
+  handler: async (ctx, { inventoryId, stateQuantity, refunded, fulfilled }) => {
     const item = await ctx.db.get(inventoryId);
 
     if (!item) return null;
-    
+
     try {
       if (refunded) {
         const quantity = item.quantity + stateQuantity;
         await ctx.db.patch(item?._id, {
-          quantity
-        })
+          quantity,
+        });
       }
 
       if (fulfilled) {
         const quantity = item.quantity - stateQuantity;
         await ctx.db.patch(item._id, {
-          quantity
-        })
+          quantity,
+        });
       }
 
-      return { success: true}
+      return { success: true };
     } catch (error) {
       console.error(JSON.stringify(error, null, 2));
-      return { success: false}
+      return { success: false };
     }
-  }
-})
+  },
+});
 // ################################################################
 // ######################### Queries ##############################
 // ################################################################
@@ -206,6 +209,66 @@ export const getInventories = query({
   },
 });
 
+export const getDasboardData = query({
+  args: { orgId: v.string() },
+  handler: async (ctx, { orgId }) => {
+    const hasAccess = await orgAccess(orgId, ctx);
+
+    if (!hasAccess) return [];
+
+    const inventories = await ctx.db
+      .query("inventory")
+      .withIndex("byOrgId", (q) => q.eq("orgId", orgId))
+      .collect();
+
+    const COGS = inventories.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
+
+    const avgInventory =
+      inventories.length > 0
+        ? inventories.reduce(
+            (acc, item) => acc + item.price * item.quantity,
+            0
+          ) / inventories.length
+        : 0;
+
+    const turnoverRate = COGS / avgInventory;
+
+    return { COGS, avgInventory, turnoverRate };
+  },
+});
+
+export const getStatusCounts = query({
+  args: { orgId: v.string() },
+  handler: async (ctx, { orgId }) => {
+    const hasAccess = await orgAccess(orgId, ctx);
+
+    if (!hasAccess) return [];
+
+    const inventories = await ctx.db
+      .query("inventory")
+      .withIndex("byOrgId", (q) => q.eq("orgId", orgId))
+      .collect();
+
+    if (!inventories) return {};
+
+    const statusCounts = inventories.reduce<{ [status: string]: number }>(
+      (acc, item) => {
+        if (!acc[item.status]) {
+          acc[item.status] = 0;
+        }
+        acc[item.status]++;
+        return acc;
+      },
+      {}
+    );
+
+    return statusCounts;
+  },
+});
+
 export const itemToEdit = query({
   args: { itemId: v.id("inventory") },
   handler: async (ctx, { itemId }) => {
@@ -216,8 +279,6 @@ export const itemToEdit = query({
     return await ctx.db.get(item.item._id);
   },
 });
-
-
 
 // ################################################################
 // #################### Utility Functions #########################

@@ -1,7 +1,10 @@
 "use client";
 
-import { useAuth, useClerk } from "@clerk/nextjs";
+import { useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
+import { api } from "@/convex/_generated/api";
+import { useAuth, useClerk } from "@clerk/nextjs";
+
 import {
     Link,
     LogOut,
@@ -22,9 +25,14 @@ import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 
 
+
 export const MobileSidebar = ({ isAdmin }: { isAdmin: boolean }) => {
     const { signOut } = useClerk();
+    const { orgId: id } = useAuth();
     const router = useRouter();
+
+    const orgId = id ? id : "skip";
+    const requestsNumber = useQuery(api.stagingArea.getNumberOfRequests, { orgId });
 
     const handleSignOut = () => {
         signOut();
@@ -68,11 +76,13 @@ export const MobileSidebar = ({ isAdmin }: { isAdmin: boolean }) => {
                     {isAdmin && (
                         <Link
                             href="/requests"
-                            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8"
+                            className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8 relative"
                         >
                             <GitPullRequest className="h-5 w-5" />
                             <span className="sr-only">Requests</span>
-                            {/* Add the number of requests in here */}
+                            <span className="absolute top-0 right-0 bg-rose-500 text-white text-xs rounded-full px-1">
+                                {requestsNumber}
+                            </span>
                         </Link>
                     )}
 

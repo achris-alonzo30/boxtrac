@@ -1,7 +1,6 @@
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { MutationCtx, QueryCtx, mutation, query } from "./_generated/server";
 import { dataType, inventoryData, orderData } from "./schema";
-import { orgAccess } from "./inventories";
 
 export const addToStagingArea = mutation({
   args: {
@@ -55,6 +54,20 @@ export const getItemsInStagingArea = query({
   },
 });
 
+export const getNumberOfRequests = query({
+  args: { orgId: v.string(), },
+  handler: async (ctx, { orgId }) => {
+    const res = await ctx.db
+      .query("stagingArea")
+      .withIndex("byOrgId", (q) =>
+        q.eq("orgId", orgId)
+      )
+      .collect();
+
+    return res.length;
+  }
+})
+
 export const clear = mutation({
   args: {
     itemId: v.id("stagingArea"),
@@ -74,3 +87,27 @@ export const clear = mutation({
     }
   }
 })
+
+export async function orgAccess(orgId: string, ctx: QueryCtx | MutationCtx) {
+  const identity = await ctx.auth.getUserIdentity();
+
+  if (!identity) return null;
+
+  const user = await ctx.db
+    .query("users")
+    .withIndex("by_tokenIdentifier", (q) =>
+      q.eq("tokenIdentifier", identity.tokenIdentifier)
+    )
+    .first();
+
+  if (!user) return null;
+
+  // The user has access if either the user orgId is the orgId or if the user is in the org
+  const hasAccess =
+    user.orgIds.some((id) => id.orgId === orgId) ||
+    user.tokenIdentifier.includes(orgId);
+
+  if (!hasAccess) return null;
+
+  return { user };
+}

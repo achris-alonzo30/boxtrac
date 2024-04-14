@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { useClerk, useAuth } from "@clerk/nextjs";
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -20,8 +22,12 @@ import { ActionTooltip } from "@/components/action-tooltip";
 
 export const Sidebar = ({ isAdmin }: { isAdmin: boolean }) => {
     const pathname = usePathname();
-    const router = useRouter();
     const { signOut } = useClerk();
+    const { orgId: id } = useAuth();
+    const router = useRouter();
+
+    const orgId = id ? id : "skip";
+    const requestsNumber = useQuery(api.stagingArea.getNumberOfRequests, { orgId });
 
     const handleSignOut = () => {
         signOut();
@@ -66,11 +72,13 @@ export const Sidebar = ({ isAdmin }: { isAdmin: boolean }) => {
                     <ActionTooltip name="Requests">
                         <Link
                             href="/requests"
-                            className={cn("flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8", pathname === "/requests" && "bg-muted")}
+                            className={cn("flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:text-foreground md:h-8 md:w-8 relative", pathname === "/requests" && "bg-muted")}
                         >
                             <GitPullRequest className={cn("h-5 w-5", pathname === "/requests" && "text-[#2ca9bc]")} />
                             <span className="sr-only">Requests</span>
-                            {/* Add the number of requests in here */}
+                            <span className="absolute top-0 right-0 bg-rose-500 text-white text-xs rounded-full px-1">
+                                {requestsNumber}
+                            </span>
                         </Link>
                     </ActionTooltip>
                 )}
