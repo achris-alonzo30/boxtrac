@@ -18,7 +18,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 export const CardKPIHolder = ({ orgId }: { orgId: string}) => {
     const data = useQuery(api.inventories.getDasboardData, { orgId })
 
-    if (data === undefined) {
+    if (data === undefined || (Array.isArray(data) && data.length === 0)) {
         return (
             <>
                 <Skeleton className="h-40 w-full" />
@@ -63,7 +63,7 @@ export const CardKPIHolder = ({ orgId }: { orgId: string}) => {
                     <Recycle className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-4xl font-bold">{turnoverRate.toFixed(2)}% </div>
+                    <div className="text-4xl font-bold">{typeof turnoverRate === 'number' ? turnoverRate.toFixed(2) + '%' : 'N/A'}</div>
                 </CardContent>
             </Card>
         </>

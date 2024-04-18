@@ -15,7 +15,7 @@ import { Loader } from '@/components/loader';
 export function InventoryLevels({ orgId }: { orgId: string }) {
   const data = useQuery(api.inventories.getStatusCounts, { orgId })
 
-  if (data === undefined) {
+  if (data === undefined || (Array.isArray(data) && data.length === 0)) {
     return (
       <div className="flex h-40 w-full items-center justify-center">
         <Loader text="Loading Chart..." />

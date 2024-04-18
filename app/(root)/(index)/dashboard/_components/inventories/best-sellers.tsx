@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const BestSellers = ({ orgId }: { orgId: string }) => {
     const orders = useQuery(api.orders.getBestSellers, { orgId });
 
-    if (!Array.isArray(orders)) {
+    if (orders === undefined || !Array.isArray(orders)) {
         return (
             <CardContent className="grid gap-8">
                 <Skeleton className="h-9 w-9 rounded-lg bg-muted" />
