@@ -18,6 +18,12 @@ p {
   font-family: "Lato", sans-serif;
 }
 
+body,
+html,
+:root {
+  height: 100%;
+}
+
 
 @layer base {
   :root {
