@@ -32,11 +32,11 @@
 
 | <div style="width:140px">**Category**</div> | <div style="width:100px">**Choice**</div> | **Descriptions** |
 |---|---|---|
-| **Frontend** | [React](https://github.com/facebook/react) | Building a performant, interactive, and visually appealing interface. |
-| **Web Framework** | [Next.js](https://github.com/vercel/next.js) | Building a performant, interactive, and visually appealing interface. |
-| **Language** | [TypeScript](https://github.com/microsoft/TypeScript) | Building a performant, interactive, and visually appealing interface. |
-| **CSS Framework** | [Tailwind CSS](https://github.com/tailwindlabs/tailwindcss) | Building a performant, interactive, and visually appealing interface. |
-| **UI Library** | [Shadcn-UI](https://github.com/shadcn-ui/ui) | Building a performant, interactive, and visually appealing interface. |
+| **Frontend** | [React](https://github.com/facebook/react) | Declarative and component-based for building interactive UIs. |
+| **Web Framework** | [Next.js](https://github.com/vercel/next.js) | Server-side rendering and static site generation for SEO and performance. |
+| **Language** | [TypeScript](https://github.com/microsoft/TypeScript) | Static typing for improved code maintainability and fewer errors. |
+| **CSS Framework** | [Tailwind CSS](https://github.com/tailwindlabs/tailwindcss) | Utility-first approach for rapid UI development and customization. |
+| **UI Library** | [Shadcn-UI](https://github.com/shadcn-ui/ui) | Pre-built components for a consistent and modern UI experience. |
 | **Backend** | [Convex-DB](https://github.com/get-convex/convex-backend) | Real-time data management, serverless functions, and efficient queries. |
 | **Authentication** | [Clerk](https://github.com/clerk/clerk-docs) | Seamless user authentication and authorization. |
 | **Lucide Icon** | [Lucide-Icon](https://github.com/lucide-icons/lucide) | Intuitive and minimalist icons |
@@ -74,9 +74,9 @@ CONVEX_DEPLOYMENT=<AUTO_GENERATED_BY_CONVEX>
 NEXT_PUBLIC_CONVEX_URL=<AUTO_GENERATED_BY_CONVEX>
 
 // Signin to Clerk: https://dashboard.clerk.com/
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_Y2FwaXRhbC1zYXdmaXNoLTExLmNsZXJrLmFjY291bnRzLmRldiQ
-CLERK_SECRET_KEY=sk_test_1gAeR4zzF764gPLcZhAkXvDK8NUyjAj2mN98UiUjr6
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
+CLERK_SECRET_KEY=
 
 // This is for connecting Clerk with your database. You can start reading the docs: https://clerk.com/docs/integrations/webhooks/overview#webhooks-overview
-CLERK_WEBHOOK_SECRET=whsec_v0BHtEbLesq2O/2NbZZmivQpWgvrz9B4
+CLERK_WEBHOOK_SECRET=
 ```
