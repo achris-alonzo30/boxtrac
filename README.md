@@ -13,7 +13,7 @@
 <p align="center">I built it for my friend who is struggling to manage their business.</p>
 
 
-## Managed your Inventory and Orders in One Platform
+## 📦 Managed your Inventory and Orders in One Platform 📦
 
 <video width="100%" controls autoPlay mute src="https://github.com/user-attachments/assets/272305c8-c374-4f1f-88a2-126f0e75a482"></video>
 
@@ -43,7 +43,7 @@
 | **Zod** | [Zod](https://github.com/colinhacks/zod) | TypeScript-first schema validation with static type inference |
 | **React-Hook-Form** | [React-Hook-Form](https://github.com/react-hook-form/react-hook-form) | React Hooks for form state management and validation. |
 
-## Getting started
+## 🔥 Getting started 🔥
 
 To clone and run this application, you'll need [Git](https://github.com/achris-alonzo30/hireme.git) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
 
@@ -61,8 +61,8 @@ $ npm install or bun install
 $ npm run dev or bun run dev
 ```
 
-## **Prerequisites**
-
+## ‼️ **Prerequisites** ‼️
+ 
 > [Convex](https://docs.convex.dev/quickstart/nextjs) Create your account on Convex for free and get your API keys by following the instructions on the given link.
 
 > [Clerk](https://clerk.com/docs/quickstarts/nextjs?_gl=1*16h2u9o*_gcl_au*MTA1NjE5MjEyNS4xNzAzNDYxNjMx*_ga*NjUzNTQzNzQ2LjE3MDM0NjE2MzE.*_ga_1WMF5X234K*MTcwMzQ2MTYzMC4xLjEuMTcwMzQ2MTc4Ny4wLjAuMA..) Create your account on Clerk for free and get your API keys by following the instructions on the given link.
