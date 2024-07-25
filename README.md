@@ -18,7 +18,7 @@
 <video width="100%" controls autoPlay mute src="https://github.com/user-attachments/assets/272305c8-c374-4f1f-88a2-126f0e75a482"></video>
 
 
-## Other Features of Boxtrac
+## ✨ Main Features of Boxtrac ✨
 | <div style="width:285px">**Feature**</div> | **Description** |
 |---|---|
 | **1. Privacy Workspace** | A secure, personalized environment where users can manage their inventory and orders, with end-to-end encryption powered by Clerk. |
@@ -28,7 +28,7 @@
 | **5. Clean, Modern UI using TailwindCSS and Shadcn-UI** | A visually appealing and user-friendly interface that provides a seamless experience across devices, built with cutting-edge technologies for optimal performance and responsiveness. |
 
 
-## 📚 Tech Stack
+## 📚 Tech Stack 📚
 
 | <div style="width:140px">**Category**</div> | <div style="width:100px">**Choice**</div> | **Descriptions** |
 |---|---|---|
